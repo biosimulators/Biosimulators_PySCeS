@@ -1,0 +1,185 @@
+{
+  "id": "pysces",
+  "name": "PySceS",
+  "version": "0.9.8",
+  "description": "Simulation and analysis tools for modelling biological systems",
+  "url": "http://pysces.sourceforge.net/",
+  "dockerHubImageId": "docker.io/biosimulators/pysces:0.9.8",
+  "format": {
+    "name": "Docker Image",
+    "version": "1.2",
+    "spec_url": "https://github.com/moby/moby/blob/master/image/spec/v1.2.md"
+  },
+  "authors": [{
+      "firstName": "Brett",
+      "middleName": "G.",
+      "lastName": "Olivier"
+    },
+    {
+      "firstName": "Johann",
+      "middleName": "M.",
+      "lastName": "Rohwer"
+    },
+    {
+      "firstName": "Jan-Hendrik",
+      "middleName": "S.",
+      "lastName": "Hofmeyr"
+    },
+    {
+      "firstName": "Danie",
+      "middleName": null,
+      "lastName": "Palm"
+    },
+    {
+      "firstName": "Katrin",
+      "middleName": null,
+      "lastName": "Leinweber"
+    }
+  ],
+  "references": {
+    "identifiers": [{
+      "namespace": "biotools",
+      "id": "pysces",
+      "url": "https://bio.tools/pysces"
+    }],
+    "citations": [{
+        "title": "Modelling cellular systems with PySCeS",
+        "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
+        "journal": "Bioinformatics",
+        "volume": 21,
+        "issue": 4,
+        "pages": "560-561",
+        "year": 2005,
+        "identifiers": [{
+            "namespace": "doi",
+            "id": "10.1093/bioinformatics/bti046",
+            "url": "https://doi.org/10.1093/bioinformatics/bti046"
+          }
+        ]
+      }
+    ]
+  },
+  "license": "BSD",
+  "algorithms": [{
+      "id": "lsoda",
+      "name": "Livermore solver systems for ordinary differential equations with automatic method switching",
+      "kisaoId": {
+        "namespace": "KISAO",
+        "id": "KISAO_0000088"
+      },
+      "modelingFrameworks": [{
+        "namespace": "SBO",
+        "id": "SBO_0000293"
+      }],
+      "modelFormats": [{
+        "namespace": "EDAM",
+        "id": "format_2585"
+      }],
+      "simulationFormats": [{
+        "namespace": "EDAM",
+        "id": "format_3685"
+      }],
+      "archiveFormats": [{
+        "namespace": "EDAM",
+        "id": "format_3686"
+      }],
+      "citations": [{
+        "title": "LSODA, ordinary differential equation solver for stiff or non-stiff system",
+        "authors": "Alan C. Hindmarsh & Linda R. Petzold",
+        "year": 2005,
+        "identifiers": [{
+          "namespace": "inis",
+          "id": "RN:41086668",
+          "url": "https://inis.iaea.org/search/search.aspx?orig_q=RN:41086668"
+        }]
+      }],
+      "parameters": [{
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000209"
+          },
+          "name": "relative tolerance",
+          "type": "float",
+          "value": 1e-6
+        }
+      ]
+    },
+    {
+      "id": "CVODES",
+      "name": "The CVODE is a package written in C that solves ODE initial value problems, in real N-space, written as y'=f(t,y), y(t0)=y0.",
+      "kisaoId": {
+        "namespace": "KISAO",
+        "id": "KISAO_0000019"
+      },
+      "modelingFrameworks": [{
+        "namespace": "SBO",
+        "id": "SBO_0000293"
+      }],
+      "modelFormats": [{
+        "namespace": "EDAM",
+        "id": "format_2585"
+      }],
+      "simulationFormats": [{
+        "namespace": "EDAM",
+        "id": "format_3685"
+      }],
+      "archiveFormats": [{
+        "namespace": "EDAM",
+        "id": "format_3686"
+      }],
+      "citations": [{
+          "title": "CVODE, a stiff/nonstiff ODE solver in C",
+          "authors": "Scott D. Cohen, Alan C. Hindmarsh & Paul F. Dubois",
+          "journal": "Computers in Physics",
+          "volume": 10,
+          "issue": 2,
+          "pages": "138-143",
+          "year": 1996,
+          "identifiers": [{"namespace": "doi", "id": "10.1063/1.4822377", "url": "https://doi.org/10.1063/1.4822377"}]
+      }],
+      "parameters": [{
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000209"
+          },
+          "name": "relative tolerance",
+          "type": "float",
+          "value": null
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000211"
+          },
+          "name": "absolute tolerance",
+          "type": "float",
+          "value": null
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000415"
+          },
+          "name": "Maximum number of steps",
+          "type": "integer",
+          "value": 500
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000XXX"
+          },
+          "name": "Flag to activate stability limit detection",
+          "type": "boolean",
+          "value": false
+        }
+      ]
+    }
+  ],
+  "created": "2020-10-261T12:00:00Z",
+  "updated": "2020-10-26T12:00:00Z",
+  "biosimulators": {
+    "schemaVersion": "1.0.0",
+    "imageVersion": "1.0.0"
+  }
+}
