@@ -4,11 +4,10 @@
   "version": "0.9.8",
   "description": "Simulation and analysis tools for modelling biological systems",
   "url": "http://pysces.sourceforge.net/",
-  "dockerHubImageId": "docker.io/biosimulators/pysces:0.9.8",
+  "image": "docker.io/biosimulators/pysces:0.9.8",
   "format": {
-    "name": "Docker Image",
-    "version": "1.2",
-    "spec_url": "https://github.com/moby/moby/blob/master/image/spec/v1.2.md"
+    "namespace": "EDAM",
+    "id": "format_3973"
   },
   "authors": [{
       "firstName": "Brett",
