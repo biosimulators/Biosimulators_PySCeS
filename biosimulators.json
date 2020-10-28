@@ -56,7 +56,10 @@
       }]
     }]
   },
-  "license": "BSD",
+  "license": {
+    "namespace": "SPDX",
+    "id": "BSD-3-Clause"
+  },
   "algorithms": [{
       "id": "lsoda",
       "name": "Livermore solver systems for ordinary differential equations with automatic method switching",
@@ -259,10 +262,10 @@
       ]
     }
   ],
-  "created": "2020-10-261T12:00:00Z",
-  "updated": "2020-10-26T12:00:00Z",
   "biosimulators": {
     "schemaVersion": "1.0.0",
     "imageVersion": "1.0.0"
-  }
+  },
+  "created": "2020-10-28T12:00:00Z",
+  "updated": "2020-10-28T12:00:00Z"
 }
