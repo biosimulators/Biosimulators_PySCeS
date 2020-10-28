@@ -40,6 +40,11 @@
       "namespace": "biotools",
       "id": "pysces",
       "url": "https://bio.tools/pysces"
+    },
+    {
+      "namespace": "pypi",
+      "id": "pysces",
+      "url": "https://pypi.org/project/pysces/"
     }],
     "citations": [{
       "title": "Modelling cellular systems with PySCeS",
