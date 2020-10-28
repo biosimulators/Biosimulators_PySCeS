@@ -42,21 +42,19 @@
       "url": "https://bio.tools/pysces"
     }],
     "citations": [{
-        "title": "Modelling cellular systems with PySCeS",
-        "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
-        "journal": "Bioinformatics",
-        "volume": 21,
-        "issue": 4,
-        "pages": "560-561",
-        "year": 2005,
-        "identifiers": [{
-            "namespace": "doi",
-            "id": "10.1093/bioinformatics/bti046",
-            "url": "https://doi.org/10.1093/bioinformatics/bti046"
-          }
-        ]
-      }
-    ]
+      "title": "Modelling cellular systems with PySCeS",
+      "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
+      "journal": "Bioinformatics",
+      "volume": 21,
+      "issue": 4,
+      "pages": "560-561",
+      "year": 2005,
+      "identifiers": [{
+        "namespace": "doi",
+        "id": "10.1093/bioinformatics/bti046",
+        "url": "https://doi.org/10.1093/bioinformatics/bti046"
+      }]
+    }]
   },
   "license": "BSD",
   "algorithms": [{
@@ -195,14 +193,18 @@
         "id": "format_3686"
       }],
       "citations": [{
-          "title": "CVODE, a stiff/nonstiff ODE solver in C",
-          "authors": "Scott D. Cohen, Alan C. Hindmarsh & Paul F. Dubois",
-          "journal": "Computers in Physics",
-          "volume": 10,
-          "issue": 2,
-          "pages": "138-143",
-          "year": 1996,
-          "identifiers": [{"namespace": "doi", "id": "10.1063/1.4822377", "url": "https://doi.org/10.1063/1.4822377"}]
+        "title": "CVODE, a stiff/nonstiff ODE solver in C",
+        "authors": "Scott D. Cohen, Alan C. Hindmarsh & Paul F. Dubois",
+        "journal": "Computers in Physics",
+        "volume": 10,
+        "issue": 2,
+        "pages": "138-143",
+        "year": 1996,
+        "identifiers": [{
+          "namespace": "doi",
+          "id": "10.1063/1.4822377",
+          "url": "https://doi.org/10.1063/1.4822377"
+        }]
       }],
       "parameters": [{
           "kisaoId": {
