@@ -95,11 +95,79 @@
       "parameters": [{
           "kisaoId": {
             "namespace": "KISAO",
+            "id": "KISAO_0000211"
+          },
+          "id": "atol",
+          "name": "absolute tolerance",
+          "type": "float",
+          "value": 1.0e-12
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
             "id": "KISAO_0000209"
           },
+          "id": "rtol",
           "name": "relative tolerance",
           "type": "float",
-          "value": 1e-6
+          "value": 1.0e-7
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000415"
+          },
+          "id": "mxstep",
+          "name": "Maximum number of (internally defined) steps allowed for each integration point in t",
+          "type": "integer"
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000483"
+          },
+          "id": "h0",
+          "name": "The step size to be attempted on the first step",
+          "type": "float"
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000467"
+          },
+          "id": "hmax",
+          "name": "The maximum absolute step size allowed",
+          "type": "float"
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000485"
+          },
+          "id": "hmin",
+          "name": "The minimum absolute step size allowed",
+          "type": "float",
+          "value": 0.0
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000219"
+          },
+          "id": "mxordn",
+          "name": "Maximum order to be allowed for the non-stiff (Adams) method",
+          "type": "integer",
+          "value": 12
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000220"
+          },
+          "id": "mxords",
+          "name": "Maximum order to be allowed for the stiff (BDF) method",
+          "type": "integer",
+          "value": 5
         }
       ]
     },
@@ -139,38 +207,52 @@
       "parameters": [{
           "kisaoId": {
             "namespace": "KISAO",
-            "id": "KISAO_0000209"
+            "id": "KISAO_0000211"
           },
-          "name": "relative tolerance",
+          "id": "abstol",
+          "name": "absolute tolerance",
           "type": "float",
-          "value": null
+          "value": 1e-15
         },
         {
           "kisaoId": {
             "namespace": "KISAO",
-            "id": "KISAO_0000211"
+            "id": "KISAO_0000242"
           },
-          "name": "absolute tolerance",
+          "id": "abstol_factor",
+          "name": "absolute tolerance adjustment factor",
           "type": "float",
-          "value": null
+          "value": 1e-6
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000209"
+          },
+          "id": "reltol",
+          "name": "relative tolerance",
+          "type": "float",
+          "value": 1e-9
+        },
+        {
+          "kisaoId": {
+            "namespace": "KISAO",
+            "id": "KISAO_0000243"
+          },
+          "id": "auto_tol_adjust",
+          "name": "auto reduce tolerances",
+          "type": "boolean",
+          "value": true
         },
         {
           "kisaoId": {
             "namespace": "KISAO",
             "id": "KISAO_0000415"
           },
+          "id": "mxstep",
           "name": "Maximum number of steps",
           "type": "integer",
-          "value": 500
-        },
-        {
-          "kisaoId": {
-            "namespace": "KISAO",
-            "id": "KISAO_0000XXX"
-          },
-          "name": "Flag to activate stability limit detection",
-          "type": "boolean",
-          "value": false
+          "value": 1000
         }
       ]
     }
