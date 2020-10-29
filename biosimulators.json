@@ -130,7 +130,7 @@
         {
           "kisaoId": {
             "namespace": "KISAO",
-            "id": "KISAO_0000483"
+            "id": "KISAO_0000559"
           },
           "id": "h0",
           "name": "The step size to be attempted on the first step",
@@ -227,7 +227,7 @@
         {
           "kisaoId": {
             "namespace": "KISAO",
-            "id": "KISAO_0000242"
+            "id": "KISAO_0000571"
           },
           "id": "abstol_factor",
           "name": "absolute tolerance adjustment factor",
@@ -247,7 +247,7 @@
         {
           "kisaoId": {
             "namespace": "KISAO",
-            "id": "KISAO_0000243"
+            "id": "KISAO_0000570"
           },
           "id": "auto_tol_adjust",
           "name": "auto reduce tolerances",
