@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 
 # metadata
 LABEL base_image="ubuntu:20.04"
-LABEL version="1.0.0"
+LABEL version="0.0.1"
 LABEL software="PySCeS"
 LABEL software.version="0.9.8"
 LABEL about.summary="Simulation and analysis tools for modelling biological systems"
