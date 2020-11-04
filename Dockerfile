@@ -1,8 +1,8 @@
 # Base OS
-FROM ubuntu:20.04
+FROM continuumio/miniconda3:4.8.2
 
 # metadata
-LABEL base_image="ubuntu:20.04"
+LABEL base_image="continuumio/miniconda3:4.8.2"
 LABEL version="0.0.1"
 LABEL software="PySCeS"
 LABEL software.version="0.9.8"
@@ -16,18 +16,19 @@ LABEL extra.identifiers.biotools="pysces"
 LABEL maintainer="BioSimulators Team <info@biosimulators.org>"
 
 # Install requirements
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        python3 \
-        python3-pip \
-    && pip3 install -U pip \
-    && pip3 install -U setuptools \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+ENV CONDA_ENV=py37 \
+    PATH=/opt/conda/envs/${CONDA_ENV}/bin:${PATH}
+RUN conda update -y -n base -c defaults conda \
+    && conda create -y -n ${CONDA_ENV} python=3.7 \
+    && conda install --name ${CONDA_ENV} -y -c bgoli -c sbmlteam -c conda-forge \
+        pysces \
+        python-libsbml
+    && /bin/bash -c "source activate ${CONDA_ENV}" \
+    && pip install pysundials
 
 # Copy code for command-line interface into image and install it
-COPY . /root/biosimulators_pysces
-RUN pip3 install /root/biosimulators_pysces
+COPY . /root/Biosimulators_pysces
+RUN pip3 install /root/Biosimulators_pysces
 
 # Entrypoint
 ENTRYPOINT ["pysces"]
