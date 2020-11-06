@@ -1,6 +1,12 @@
 # BioSimulators-PySCeS
 BioSimulators-compliant command-line interface to the [PySCeS](http://pysces.sourceforge.net/) simulation program.
 
+This command-line interface and Docker image enable users to use PySCeS to execute [COMBINE/OMEX archives](https://combinearchive.org/) that describe one or more simulation experiments (in [SED-ML format](https://sed-ml.org)) of one or more models (in [SBML format](http://sbml.org])).
+
+A list of the algorithms and algorithm parameters supported by PySCeS is available at [BioSimulators](https://biosimulators.org/simulators/pysces).
+
+A simple web application and web service for using PySCeS to execute COMBINE/OMEX archives is also available at [runBioSimulations](https://run.biosimulations.org).
+
 ## Contents
 * [Installation](#installation)
 * [Usage](#usage)
