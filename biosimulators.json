@@ -37,14 +37,19 @@
   ],
   "references": {
     "identifiers": [{
-      "namespace": "biotools",
-      "id": "pysces",
-      "url": "https://bio.tools/pysces"
-    },
-    {
       "namespace": "pypi",
       "id": "pysces",
       "url": "https://pypi.org/project/pysces/"
+    },
+    {
+      "namespace": "pypi",
+      "id": "biosimulators-pysces",
+      "url": "https://pypi.org/project/biosimulators-pysces/"
+    },
+    {
+      "namespace": "biotools",
+      "id": "pysces",
+      "url": "https://bio.tools/pysces"
     }],
     "citations": [{
       "title": "Modelling cellular systems with PySCeS",
@@ -272,5 +277,6 @@
     "imageVersion": "1.0.0"
   },
   "created": "2020-10-28T12:00:00Z",
-  "updated": "2020-10-28T12:00:00Z"
+  "updated": "2020-10-28T12:00:00Z",
+  "validated": false
 }
