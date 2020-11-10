@@ -274,9 +274,9 @@
   ],
   "biosimulators": {
     "specificationsVersion": "1.0.0",
-    "imageVersion": "1.0.0"
+    "imageVersion": "1.0.0",
+    "validated": false
   },
   "created": "2020-10-28T12:00:00Z",
-  "updated": "2020-10-28T12:00:00Z",
-  "validated": false
+  "updated": "2020-10-28T12:00:00Z"  
 }
