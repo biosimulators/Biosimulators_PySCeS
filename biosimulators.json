@@ -4,7 +4,7 @@
   "version": "0.9.8",
   "description": "Simulation and analysis tools for modelling biological systems",
   "url": "http://pysces.sourceforge.net/",
-  "image": "ghcr.io/biosimulators/pysces:0.9.8",
+  "image": "ghcr.io/biosimulators/biosimulators_pysces/pysces:0.9.8",
   "format": {
     "namespace": "EDAM",
     "id": "format_3973"
