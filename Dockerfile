@@ -2,18 +2,29 @@
 FROM continuumio/miniconda3:4.8.2
 
 # metadata
-LABEL base_image="continuumio/miniconda3:4.8.2"
-LABEL version="0.0.1"
-LABEL software="PySCeS"
-LABEL software.version="0.9.8"
-LABEL about.summary="Simulation and analysis tools for modelling biological systems"
-LABEL about.home="http://pysces.sourceforge.net/"
-LABEL about.documentation="https://pythonhosted.org/PySCeS/"
-LABEL about.license_file="https://github.com/PySCeS/pysces/blob/master/LICENSE.txt"
-LABEL about.license="BSD-3-Clause"
-LABEL about.tags="BioSimulators,mathematical model,kinetic model,simulation,systems biology,computational biology,SBML,SED-ML,COMBINE,OMEX"
-LABEL extra.identifiers.biotools="pysces"
-LABEL maintainer="BioSimulators Team <info@biosimulators.org>"
+LABEL \
+    org.opencontainers.image.title="PySCeS" \
+    org.opencontainers.image.version="0.9.8" \
+    org.opencontainers.image.description="Simulation and analysis tools for modelling biological systems" \
+    org.opencontainers.image.url="http://pysces.sourceforge.net/" \
+    org.opencontainers.image.documentation="https://pythonhosted.org/PySCeS/" \
+    org.opencontainers.image.source="https://github.com/biosimulators/Biosimulators_PySCeS" \
+    org.opencontainers.image.authors="BioSimulators Team <info@biosimulators.org>" \
+    org.opencontainers.image.vendor="BioSimulators Team" \
+    org.opencontainers.image.licenses="BSD-3-Clause" \
+    \
+    base_image="continuumio/miniconda3:4.8.2" \
+    version="0.0.1" \
+    software="PySCeS" \
+    software.version="0.9.8" \
+    about.summary="Simulation and analysis tools for modelling biological systems" \
+    about.home="http://pysces.sourceforge.net/" \
+    about.documentation="https://pythonhosted.org/PySCeS/" \
+    about.license_file="https://github.com/PySCeS/pysces/blob/master/LICENSE.txt" \
+    about.license="SPDX:BSD-3-Clause" \
+    about.tags="BioSimulators,mathematical model,kinetic model,simulation,systems biology,computational biology,SBML,SED-ML,COMBINE,OMEX" \
+    extra.identifiers.biotools="pysces" \
+    maintainer="BioSimulators Team <info@biosimulators.org>"
 
 # Install requirements
 ENV CONDA_ENV=py37 \
@@ -22,9 +33,57 @@ RUN conda update -y -n base -c defaults conda \
     && conda create -y -n ${CONDA_ENV} python=3.7 \
     && conda install --name ${CONDA_ENV} -y -c bgoli -c sbmlteam -c conda-forge \
         pysces \
-        python-libsbml
+        python-libsbml \
+        sundials \
     && /bin/bash -c "source activate ${CONDA_ENV}" \
-    && pip install pysundials
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        build-essential \
+    && pip install pysundials \
+    && apt-get remove -y \
+        gcc \
+        build-essential \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists
+
+
+ARG sundials_version=2.3.0
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        gfortran \
+        libopenblas-base \
+        libopenblas-dev \
+        wget \
+    \
+    && cd /tmp \
+    && wget https://computation.llnl.gov/projects/sundials/download/sundials-${sundials_version}.tar.gz \
+    && tar xzf sundials-${sundials_version}.tar.gz \
+    && cd sundials-${sundials_version} \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DEXAMPLES_ENABLE=OFF \
+        -DLAPACK_ENABLE=ON \
+        -DSUNDIALS_INDEX_TYPE=int32_t \
+        .. \
+    && make \
+    && make install \
+    \
+    && cd /tmp \
+    && rm sundials-${sundials_version}.tar.gz \
+    && rm -r sundials-${sundials_version} \
+    \
+    && apt-get remove -y \
+        build-essential \
+        cmake \
+        libopenblas-dev \
+        wget \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Copy code for command-line interface into image and install it
 COPY . /root/Biosimulators_pysces
