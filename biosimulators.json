@@ -8,8 +8,9 @@
     "url": "ghcr.io/biosimulators/biosimulators_pysces/pysces:0.9.8",
     "format": {
       "namespace": "EDAM",
-      "id": "format_3973", "version": null
-    }
+      "id": "format_3973", "version": null, "supportedFeatures": []
+    },
+    "operatingSystemType": "Linux"
   },
   "authors": [{
       "firstName": "Brett",
@@ -90,15 +91,15 @@
       }],
       "modelFormats": [{
         "namespace": "EDAM",
-        "id": "format_2585", "version": null
+        "id": "format_2585", "version": null, "supportedFeatures": []
       }],
       "simulationFormats": [{
         "namespace": "EDAM",
-        "id": "format_3685", "version": null
+        "id": "format_3685", "version": null, "supportedFeatures": []
       }],
       "archiveFormats": [{
         "namespace": "EDAM",
-        "id": "format_3686", "version": null
+        "id": "format_3686", "version": null, "supportedFeatures": []
       }],
       "citations": [{
         "title": "LSODA, ordinary differential equation solver for stiff or non-stiff system",
@@ -207,7 +208,8 @@
           "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
         }
       ],
-      "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+      "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
+      "dependencies": null
     },
     {
       "id": "CVODES",
@@ -222,15 +224,15 @@
       }],
       "modelFormats": [{
         "namespace": "EDAM",
-        "id": "format_2585", "version": null
+        "id": "format_2585", "version": null, "supportedFeatures": []
       }],
       "simulationFormats": [{
         "namespace": "EDAM",
-        "id": "format_3685", "version": null
+        "id": "format_3685", "version": null, "supportedFeatures": []
       }],
       "archiveFormats": [{
         "namespace": "EDAM",
-        "id": "format_3686", "version": null
+        "id": "format_3686", "version": null, "supportedFeatures": []
       }],
       "citations": [{
         "title": "CVODE, a stiff/nonstiff ODE solver in C",
@@ -307,11 +309,20 @@
           "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
         }
       ],
-      "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+      "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
+      "dependencies": [{
+        "name": "SUNDIALS",
+        "version": null,
+        "required": true,
+        "freeNonCommercialLicense": true,
+        "url": "https://computing.llnl.gov/projects/sundials"
+      }]
     }
   ],
   "interfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
-  "supportedProgrammingLanguages": ["Python"],
+  "supportedOperatingSystemTypes": ["platform-independent"],
+  "supportedProgrammingLanguages": [{"namespace": "Linguist", "id": "Python"}],
+  "funding": [],
   "biosimulators": {
     "specificationVersion": "1.0.0",
     "imageVersion": "1.0.0",
