@@ -18,7 +18,7 @@ source_dir = os.path.join(os.path.dirname(__file__), '..', 'biosimulators_pysces
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # -- Project information -----------------------------------------------------
-source_base_url = 'https://github.com/biosimulators/BioSimulators_PySCeS/blob/dev/'
+source_base_url = 'https://github.com/biosimulators/Biosimulators_PySCeS/blob/dev/'
 project = 'BioSimulators-PySCeS'
 copyright = '{}, BioSimulators Team'.format(datetime.datetime.now().year)
 author = 'BioSimulators Team'
@@ -103,7 +103,7 @@ html_static_path = ['_static']
 
 html_theme_options = {
     'github_user': 'biosimulators',
-    'github_repo': 'BioSimulators_PySCeS',
+    'github_repo': 'Biosimulators_PySCeS',
     'github_banner': True,
     'github_button': True,
     'description': 'BioSimulators-compliant interface to PySCeS',

@@ -1,10 +1,13 @@
 # Base OS
-FROM continuumio/miniconda3:4.8.2
+FROM continuumio/miniconda3:4.9.2
+
+ARG VERSION=0.0.1
+ARG SIMULATOR_VERSION="0.9.8"
 
 # metadata
 LABEL \
     org.opencontainers.image.title="PySCeS" \
-    org.opencontainers.image.version="0.9.8" \
+    org.opencontainers.image.version="${SIMULATOR_VERSION}" \
     org.opencontainers.image.description="Simulation and analysis tools for modelling biological systems" \
     org.opencontainers.image.url="http://pysces.sourceforge.net/" \
     org.opencontainers.image.documentation="https://pythonhosted.org/PySCeS/" \
@@ -13,10 +16,10 @@ LABEL \
     org.opencontainers.image.vendor="BioSimulators Team" \
     org.opencontainers.image.licenses="BSD-3-Clause" \
     \
-    base_image="continuumio/miniconda3:4.8.2" \
-    version="0.0.1" \
+    base_image="continuumio/miniconda3:4.9.2" \
+    version="${VERSION}" \
     software="PySCeS" \
-    software.version="0.9.8" \
+    software.version="${SIMULATOR_VERSION}" \
     about.summary="Simulation and analysis tools for modelling biological systems" \
     about.home="http://pysces.sourceforge.net/" \
     about.documentation="https://pythonhosted.org/PySCeS/" \
@@ -27,15 +30,15 @@ LABEL \
     maintainer="BioSimulators Team <info@biosimulators.org>"
 
 # Install requirements
-ENV CONDA_ENV=py37 \
+ENV PYTHON_VERSION=3.8 \
+    CONDA_ENV=py3 \
     PATH=/opt/conda/envs/${CONDA_ENV}/bin:${PATH}
 RUN conda update -y -n base -c defaults conda \
-    && conda create -y -n ${CONDA_ENV} python=3.7 \
-    && conda install --name ${CONDA_ENV} -y -c bgoli -c sbmlteam -c conda-forge \
-        pysces \
+    && conda create -y -n ${CONDA_ENV} python=${PYTHON_VERSION} \
+    && conda install --name ${CONDA_ENV} -y -c bgoli -c conda-forge \
         python-libsbml \
-        sundials \
-    && /bin/bash -c "source activate ${CONDA_ENV}" \
+        pysces==${SIMULATOR_VERSION} \
+    && conda activate ${CONDA_ENV} \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
         gcc \

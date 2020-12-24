@@ -3,7 +3,7 @@ About BioSimulators-PySCeS
 
 License
 -------
-This package is released under the `MIT License <https://github.com/biosimulators/BioSimulators_PySCeS/blob/dev/LICENSE>`_. PySCeS is released under the `3 Clause BSD License <https://github.com/PySCeS/pysces/blob/master/LICENSE.txt>`_.
+This package is released under the `MIT License <https://github.com/biosimulators/Biosimulators_PySCeS/blob/dev/LICENSE>`_. PySCeS is released under the `3 Clause BSD License <https://github.com/PySCeS/pysces/blob/master/LICENSE.txt>`_.
 
 Development team
 ----------------

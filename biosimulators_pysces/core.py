@@ -1,69 +1,168 @@
 """ Methods for executing SED tasks in COMBINE archives and saving their outputs
 
 :Author: Jonathan Karr <karr@mssm.edu>
-:Date: 2020-10-29
+:Date: 2020-12-23
 :Copyright: 2020, Center for Reproducible Biomedical Modeling
 :License: MIT
 """
 
-from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResultsFormat
-from Biosimulations_utils.simulator.utils import exec_simulations_in_archive
+from .data_model import KISAO_ALGORITHM_MAP
+from biosimulators_utils.combine.exec import exec_sedml_docs_in_archive
+from biosimulators_utils.plot.data_model import PlotFormat  # noqa: F401
+from biosimulators_utils.report.data_model import ReportFormat, DataGeneratorVariableResults  # noqa: F401
+from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTimeCourseSimulation,  # noqa: F401
+                                                  DataGeneratorVariable, DataGeneratorVariableSymbol)
+from biosimulators_utils.utils.core import validate_str_value, parse_value
+from biosimulators_utils.sedml import validation
 import os
+import pysces
+import tempfile
 
 
-__all__ = ['exec_combine_archive', 'exec_simulation']
+__all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_task']
 
 
-def exec_combine_archive(archive_file, out_dir):
-    """ Execute the SED tasks defined in a COMBINE archive and save the outputs
+def exec_sedml_docs_in_combine_archive(archive_filename, out_dir,
+                                       report_formats=None, plot_formats=None,
+                                       bundle_outputs=None, keep_individual_outputs=None):
+    """ Execute the SED tasks defined in a COMBINE/OMEX archive and save the outputs
 
     Args:
-        archive_file (:obj:`str`): path to COMBINE archive
-        out_dir (:obj:`str`): directory to store the outputs of the tasks
+        archive_filename (:obj:`str`): path to COMBINE/OMEX archive
+        out_dir (:obj:`str`): path to store the outputs of the archive
+
+            * CSV: directory in which to save outputs to files
+              ``{ out_dir }/{ relative-path-to-SED-ML-file-within-archive }/{ report.id }.csv``
+            * HDF5: directory in which to save a single HDF5 file (``{ out_dir }/reports.h5``),
+              with reports at keys ``{ relative-path-to-SED-ML-file-within-archive }/{ report.id }`` within the HDF5 file
+
+        report_formats (:obj:`list` of :obj:`ReportFormat`, optional): report format (e.g., csv or h5)
+        plot_formats (:obj:`list` of :obj:`PlotFormat`, optional): report format (e.g., pdf)
+        bundle_outputs (:obj:`bool`, optional): if :obj:`True`, bundle outputs into archives for reports and plots
+        keep_individual_outputs (:obj:`bool`, optional): if :obj:`True`, keep individual output files
     """
-    exec_simulations_in_archive(archive_file, exec_simulation, out_dir, apply_model_changes=True)
+    exec_sedml_docs_in_archive(archive_filename, exec_sed_task, out_dir,
+                               apply_xml_model_changes=True,
+                               report_formats=report_formats,
+                               plot_formats=plot_formats,
+                               bundle_outputs=bundle_outputs,
+                               keep_individual_outputs=keep_individual_outputs)
 
 
-def exec_simulation(model_filename, model_sed_urn, simulation, working_dir, out_filename, out_format):
-    ''' Execute a simulation and save its results
+def exec_sed_task(task, variables):
+    ''' Execute a task and save its results
 
     Args:
-       model_filename (:obj:`str`): path to the model
-       model_sed_urn (:obj:`str`): SED URN for the format of the model (e.g., `urn:sedml:language:sbml`)
-       simulation (:obj:`TimecourseSimulation`): simulation
-       working_dir (:obj:`str`): directory of the SED-ML file
-       out_filename (:obj:`str`): path to save the results of the simulation
-       out_format (:obj:`SimulationResultsFormat`): format to save the results of the simulation (e.g., `HDF5`)
+       task (:obj:`Task`): task
+       variables (:obj:`list` of :obj:`DataGeneratorVariable`): variables that should be recorded
+
+    Returns:
+        :obj:`DataGeneratorVariableResults`: results of variables
     '''
-    # check that model is encoded in SBML
-    if model_sed_urn != "urn:sedml:language:sbml":
-        raise NotImplementedError("Model language with URN '{}' is not supported".format(model_sed_urn))
+    validation.validate_task(task)
+    validation.validate_model_language(task.model.language, ModelLanguage.SBML)
+    validation.validate_model_change_types(task.model.changes, ())
+    validation.validate_simulation_type(task.simulation, (UniformTimeCourseSimulation, ))
+    validation.validate_uniform_time_course_simulation(task.simulation)
+    validation.validate_data_generator_variables(variables)
+    target_x_paths_to_sbml_ids = validation.validate_data_generator_variable_xpaths(variables, task.model.source, attr='id')
 
-    # check that simulation is a time course simulation
-    if not isinstance(simulation, TimecourseSimulation):
-        raise NotImplementedError('{} is not supported'.format(simulation.__class__.__name__))
+    # Read the model
+    interfaces = pysces.PyscesInterfaces.Core2interfaces()
+    fid, model_filename = tempfile.mkstemp(suffix='.psc')
+    os.close(fid)
+    try:
+        interfaces.convertSBML2PSC(sbmlfile=task.model.source, pscfile=model_filename)
+    except Exception as exception:
+        os.remove(model_filename)
+        raise ValueError('Model at {} could not be imported:\n  {}'.format(
+            task.model.source, str(exception).replace('\n', '\n  ')))
+    model = pysces.model(model_filename)
+    os.remove(model_filename)
 
-    # check that model parameter changes have already been applied (because handled by :obj:`exec_simulations_in_archive`)
-    if simulation.model_parameter_changes:
-        raise NotImplementedError('Model parameter changes are not supported')
+    # Load the algorithm specified by `simulation.algorithm.kisao_id`
+    sim = task.simulation
+    integrator = KISAO_ALGORITHM_MAP.get(sim.algorithm.kisao_id, None)
+    if integrator is None:
+        raise NotImplementedError("".join([
+            "Algorithm with KiSAO id '{}' is not supported. ".format(sim.algorithm.kisao_id),
+            "Algorithm must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
+                '{}: {}'.format(kisao_id, algorithm['id'])
+                for kisao_id, algorithm in KISAO_ALGORITHM_MAP.items())),
+        ]))
+    model.mode_integrator = integrator['id']
 
-    # check that the desired output format is supported
-    if out_format != SimulationResultsFormat.HDF5:
-        raise NotImplementedError("Simulation results format '{}' is not supported".format(out_format))
+    # Apply the algorithm parameter changes specified by `task.simulation.algorithm.changes`
+    for change in sim.algorithm.changes:
+        setting = integrator['settings'].get(change.kisao_id, None)
+        if setting is None:
+            raise NotImplementedError("".join([
+                "Algorithm parameter with KiSAO id '{}' is not supported. ".format(change.kisao_id),
+                "Parameter must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
+                    '{}: {} ({})'.format(kisao_id, setting['id'], setting['name'])
+                    for kisao_id, setting in integrator['settings'].items())),
+            ]))
 
-    # Read the model located at `os.path.join(working_dir, model_filename)` in the format
-    # with the SED URN `model_sed_urn`.
+        value = change.new_value
+        if not validate_str_value(value, setting['type']):
+            raise ValueError("'{}' is not a valid {} value for parameter {}".format(
+                value, setting['type'].name, change.kisao_id))
 
-    # Apply the model parameter changes specified by `simulation.model_parameter_changes`
+        parsed_value = parse_value(value, setting['type'])
+        model.__settings__[setting['id']] = parsed_value
 
-    # Load the algorithm specified by `simulation.algorithm`
+    # setup time course
+    model.sim_start = sim.initial_time
+    model.sim_end = sim.output_end_time
+    model.sim_points = (sim.number_of_points
+                        * (sim.output_end_time - sim.initial_time)
+                        / (sim.output_end_time - sim.output_start_time)
+                        + 1)
+    if model.sim_points != int(model.sim_points):
+        raise NotImplementedError('Time course must specify an integer number of time points')
 
-    # Apply the algorithm parameter changes specified by `simulation.algorithm_parameter_changes`
+    # execute simulation
+    model.Simulate()
 
-    # Simulate the model from `simulation.start_time` to `simulation.end_time`
+    # extract results
+    variable_results = DataGeneratorVariableResults()
+    unpredicted_symbols = []
+    unpredicted_targets = []
+    results, labels = model.data_sim.getAllSimData(lbls=True)
+    labels = {label: i_label for i_label, label in enumerate(labels)}
+    for variable in variables:
+        if variable.symbol:
+            if variable.symbol == DataGeneratorVariableSymbol.time:
+                i_result = labels['Time']
+                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
+            else:
+                unpredicted_symbols.append(variable.symbol)
 
-    # Save a report of the results of the simulation with `simulation.num_time_points` time points
-    # beginning at `simulation.output_start_time` to `out_filename` in `out_format` format.
-    # This should save all of the variables specified by `simulation.model.variables`.
+        else:
+            sbml_id = target_x_paths_to_sbml_ids[variable.target]
+            i_result = labels.get(sbml_id, None)
+            if i_result is None:
+                unpredicted_targets.append(variable.target)
+            else:
+                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
 
-    pass
+    if unpredicted_symbols:
+        raise NotImplementedError("".join([
+            "The following variable symbols are not supported:\n  - {}\n\n".format(
+                '\n  - '.join(sorted(unpredicted_symbols)),
+            ),
+            "Symbols must be one of the following:\n  - {}".format(DataGeneratorVariableSymbol.time),
+        ]))
+
+    if unpredicted_targets:
+        raise ValueError(''.join([
+            'The following variable targets could not be recorded:\n  - {}\n\n'.format(
+                '\n  - '.join(sorted(unpredicted_targets)),
+            ),
+            'Targets must have one of the following ids:\n  - {}'.format(
+                '\n  - '.join(sorted(set(labels.keys()).difference(set(['Time'])))),
+            ),
+        ]))
+
+    # return results
+    return variable_results
