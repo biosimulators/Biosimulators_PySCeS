@@ -323,7 +323,6 @@ class CliTestCase(unittest.TestCase):
 
         self.assertFalse(numpy.any(numpy.isnan(report)))
 
-    @unittest.skip('PySundials not installed yet')
     def test_exec_sedml_docs_in_combine_archive_with_all_algorithms(self):
         for alg in gen_algorithms_from_specs(os.path.join(os.path.dirname(__file__), '..', 'biosimulators.json')).values():
             doc, archive_filename = self._build_combine_archive(algorithm=alg)
@@ -360,7 +359,6 @@ class CliTestCase(unittest.TestCase):
             'REPORT_FORMATS': 'h5,csv'
         }
 
-    @unittest.skip('Docker image not available yet')
     def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
         doc, archive_filename = self._build_combine_archive()
         out_dir = os.path.join(self.dirname, 'out')
