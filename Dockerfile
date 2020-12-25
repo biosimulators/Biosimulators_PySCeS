@@ -2,7 +2,8 @@
 FROM continuumio/miniconda3:4.9.2
 
 ARG VERSION=0.0.1
-ARG SIMULATOR_VERSION="0.9.8"
+ARG SIMULATOR_VERSION="0.9.9"
+ARG PYTHON_VERSION=3.7
 
 # metadata
 LABEL \
@@ -30,67 +31,41 @@ LABEL \
     maintainer="BioSimulators Team <info@biosimulators.org>"
 
 # Install requirements
-ENV PYTHON_VERSION=3.8 \
-    CONDA_ENV=py3 \
-    PATH=/opt/conda/envs/${CONDA_ENV}/bin:${PATH}
+ENV CONDA_ENV=py \
+    PATH=/opt/conda/envs/py/bin:$PATH \
+    MPLBACKEND=PDF
 RUN conda update -y -n base -c defaults conda \
     && conda create -y -n ${CONDA_ENV} python=${PYTHON_VERSION} \
-    && conda install --name ${CONDA_ENV} -y -c bgoli -c conda-forge \
-        python-libsbml \
-        pysces==${SIMULATOR_VERSION} \
-    && conda activate ${CONDA_ENV} \
+    && conda install --name ${CONDA_ENV} -y -c conda-forge \
+        assimulo \
+    && /bin/bash -c "source activate ${CONDA_ENV}" \
+    \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
-        gcc \
-        build-essential \
-    && pip install pysundials \
+        gfortran \
+    && pip install python-libsbml \
+    && pip install matplotlib \
+    \
+    && cd /tmp \
+    && git clone --branch assimulo https://github.com/PySCeS/pysces.git \
+    && cd pysces \
+    && pip install . \
+    \
+    && cd /tmp \
+    && rm -rf pysces \
+    \
     && apt-get remove -y \
-        gcc \
-        build-essential \
+        gfortran \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists
 
-
-ARG sundials_version=2.3.0
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        build-essential \
-        cmake \
-        gfortran \
-        libopenblas-base \
-        libopenblas-dev \
-        wget \
-    \
-    && cd /tmp \
-    && wget https://computation.llnl.gov/projects/sundials/download/sundials-${sundials_version}.tar.gz \
-    && tar xzf sundials-${sundials_version}.tar.gz \
-    && cd sundials-${sundials_version} \
-    && mkdir build \
-    && cd build \
-    && cmake \
-        -DEXAMPLES_ENABLE=OFF \
-        -DLAPACK_ENABLE=ON \
-        -DSUNDIALS_INDEX_TYPE=int32_t \
-        .. \
-    && make \
-    && make install \
-    \
-    && cd /tmp \
-    && rm sundials-${sundials_version}.tar.gz \
-    && rm -r sundials-${sundials_version} \
-    \
-    && apt-get remove -y \
-        build-essential \
-        cmake \
-        libopenblas-dev \
-        wget \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
-
-
 # Copy code for command-line interface into image and install it
-COPY . /root/Biosimulators_pysces
-RUN pip3 install /root/Biosimulators_pysces
+COPY . /root/Biosimulators_PySCeS
+RUN pip install /root/Biosimulators_PySCeS \
+    && mkdir /Pysces \
+    && mkdir /Pysces/psc \
+    && mv /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /Pysces/.pys_usercfg.ini \
+    && rm -rf /root/Biosimulators_PySCeS
 
 # Entrypoint
 ENTRYPOINT ["pysces"]
