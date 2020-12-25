@@ -1,0 +1,11 @@
+name: pysces
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - assimulo
+  - pip:
+    - python-libsbml
+    - matplotlib
+    - "git+https://github.com/PySCeS/pysces.git@assimulo#egg=pysces"
