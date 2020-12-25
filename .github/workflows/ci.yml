@@ -76,6 +76,7 @@ jobs:
           auto-update-conda: true
           activate-environment: pysces
           environment-file: environment.yml
+          auto-activate-base: false
 
       - name: Install dependencies
         run: |
