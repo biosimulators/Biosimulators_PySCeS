@@ -15,8 +15,10 @@ from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTi
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
 import os
-import pysces
-import tempfile
+cwd = os.getcwd()  # because PySCeS changes the working directory
+import pysces  # noqa: E402
+os.chdir(cwd)
+import tempfile  # noqa: E402
 
 
 __all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_task']

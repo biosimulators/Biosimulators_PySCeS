@@ -9,7 +9,10 @@
 from ._version import __version__
 from .core import exec_sedml_docs_in_combine_archive
 from biosimulators_utils.simulator.cli import build_cli
-import pysces
+import os
+cwd = os.getcwd()  # because PySCeS changes the working directory
+import pysces  # noqa: E402
+os.chdir(cwd)
 
 App = build_cli('pysces', __version__,
                 'PySCeS', pysces.__version__, 'http://pysces.sourceforge.net/',
