@@ -1,14 +1,19 @@
 {
   "id": "pysces",
   "name": "PySceS",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "Simulation and analysis tools for modelling biological systems",
-  "urls": [{"type": "Home page", "url": "http://pysces.sourceforge.net/"}],
+  "urls": [{
+    "type": "Home page",
+    "url": "http://pysces.sourceforge.net/"
+  }],
   "image": {
-    "url": "ghcr.io/biosimulators/biosimulators_pysces/pysces:0.9.8",
+    "url": "ghcr.io/biosimulators/biosimulators_pysces/pysces:0.9.9",
     "format": {
       "namespace": "EDAM",
-      "id": "format_3973", "version": null, "supportedFeatures": []
+      "id": "format_3973",
+      "version": null,
+      "supportedFeatures": []
     },
     "operatingSystemType": "Linux"
   },
@@ -16,49 +21,50 @@
       "firstName": "Brett",
       "middleName": "G.",
       "lastName": "Olivier",
-            "identifiers": []
+      "identifiers": []
     },
     {
       "firstName": "Johann",
       "middleName": "M.",
       "lastName": "Rohwer",
-            "identifiers": []
+      "identifiers": []
     },
     {
       "firstName": "Jan-Hendrik",
       "middleName": "S.",
       "lastName": "Hofmeyr",
-            "identifiers": []
+      "identifiers": []
     },
     {
       "firstName": "Danie",
       "middleName": null,
       "lastName": "Palm",
-            "identifiers": []
+      "identifiers": []
     },
     {
       "firstName": "Katrin",
       "middleName": null,
       "lastName": "Leinweber",
-            "identifiers": []
+      "identifiers": []
     }
   ],
   "references": {
     "identifiers": [{
-      "namespace": "pypi",
-      "id": "pysces",
-      "url": "https://pypi.org/project/pysces/"
-    },
-    {
-      "namespace": "pypi",
-      "id": "biosimulators-pysces",
-      "url": "https://pypi.org/project/biosimulators-pysces/"
-    },
-    {
-      "namespace": "biotools",
-      "id": "pysces",
-      "url": "https://bio.tools/pysces"
-    }],
+        "namespace": "pypi",
+        "id": "pysces",
+        "url": "https://pypi.org/project/pysces/"
+      },
+      {
+        "namespace": "pypi",
+        "id": "biosimulators-pysces",
+        "url": "https://pypi.org/project/biosimulators-pysces/"
+      },
+      {
+        "namespace": "biotools",
+        "id": "pysces",
+        "url": "https://bio.tools/pysces"
+      }
+    ],
     "citations": [{
       "title": "Modelling cellular systems with PySCeS",
       "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
@@ -91,15 +97,21 @@
       }],
       "modelFormats": [{
         "namespace": "EDAM",
-        "id": "format_2585", "version": null, "supportedFeatures": []
+        "id": "format_2585",
+        "version": null,
+        "supportedFeatures": []
       }],
       "simulationFormats": [{
         "namespace": "EDAM",
-        "id": "format_3685", "version": "L1V3", "supportedFeatures": []
+        "id": "format_3685",
+        "version": "L1V3",
+        "supportedFeatures": []
       }],
       "archiveFormats": [{
         "namespace": "EDAM",
-        "id": "format_3686", "version": null, "supportedFeatures": []
+        "id": "format_3686",
+        "version": null,
+        "supportedFeatures": []
       }],
       "citations": [{
         "title": "LSODA, ordinary differential equation solver for stiff or non-stiff system",
@@ -224,15 +236,21 @@
       }],
       "modelFormats": [{
         "namespace": "EDAM",
-        "id": "format_2585", "version": null, "supportedFeatures": []
+        "id": "format_2585",
+        "version": null,
+        "supportedFeatures": []
       }],
       "simulationFormats": [{
         "namespace": "EDAM",
-        "id": "format_3685", "version": "L1V3", "supportedFeatures": []
+        "id": "format_3685",
+        "version": "L1V3",
+        "supportedFeatures": []
       }],
       "archiveFormats": [{
         "namespace": "EDAM",
-        "id": "format_3686", "version": null, "supportedFeatures": []
+        "id": "format_3686",
+        "version": null,
+        "supportedFeatures": []
       }],
       "citations": [{
         "title": "CVODE, a stiff/nonstiff ODE solver in C",
@@ -321,7 +339,10 @@
   ],
   "interfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
   "supportedOperatingSystemTypes": ["platform-independent"],
-  "supportedProgrammingLanguages": [{"namespace": "Linguist", "id": "Python"}],
+  "supportedProgrammingLanguages": [{
+    "namespace": "Linguist",
+    "id": "Python"
+  }],
   "funding": [],
   "biosimulators": {
     "specificationVersion": "1.0.0",
