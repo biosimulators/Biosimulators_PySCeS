@@ -69,6 +69,9 @@ def exec_sed_task(task, variables):
     validation.validate_data_generator_variables(variables)
     target_x_paths_to_sbml_ids = validation.validate_data_generator_variable_xpaths(variables, task.model.source, attr='id')
 
+    # Get the current working directory because PySCeS opaquely changes it
+    cwd = os.getcwd()
+
     # Read the model
     interfaces = pysces.PyscesInterfaces.Core2interfaces()
     fid, model_filename = tempfile.mkstemp(suffix='.psc')
@@ -165,6 +168,9 @@ def exec_sed_task(task, variables):
                 '\n  - '.join(sorted(set(labels.keys()).difference(set(['Time'])))),
             ),
         ]))
+
+    # restore working directory
+    os.chdir(cwd)
 
     # return results
     return variable_results
