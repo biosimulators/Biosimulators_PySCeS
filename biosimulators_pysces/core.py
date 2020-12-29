@@ -19,6 +19,7 @@ cwd = os.getcwd()  # because PySCeS changes the working directory
 import pysces  # noqa: E402
 os.chdir(cwd)
 import tempfile  # noqa: E402
+import warnings  # noqa: E402
 
 
 __all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_task']
@@ -116,13 +117,21 @@ def exec_sed_task(task, variables):
         parsed_value = parse_value(value, setting['type'])
         model.__settings__[setting['id']] = parsed_value
 
+    # override algorithm choice if there are events
+    if integrator['id'] == 'LSODA' and model.__events__:
+        model.mode_integrator = 'CVODE'
+        warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events', UserWarning)
+
     # setup time course
     model.sim_start = sim.initial_time
     model.sim_end = sim.output_end_time
-    model.sim_points = (sim.number_of_points
-                        * (sim.output_end_time - sim.initial_time)
-                        / (sim.output_end_time - sim.output_start_time)
-                        + 1)
+    model.sim_points = (
+        sim.number_of_points
+        * (sim.output_end_time - sim.initial_time)
+        / (sim.output_end_time - sim.output_start_time)
+    )
+    if model.mode_integrator == 'LSODA':
+        model.sim_points += 1
     if model.sim_points != int(model.sim_points):
         raise NotImplementedError('Time course must specify an integer number of time points')
 
