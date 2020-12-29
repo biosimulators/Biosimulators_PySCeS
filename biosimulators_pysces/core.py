@@ -8,13 +8,16 @@
 
 from .data_model import KISAO_ALGORITHM_MAP
 from biosimulators_utils.combine.exec import exec_sedml_docs_in_archive
+from biosimulators_utils.config import get_config
 from biosimulators_utils.plot.data_model import PlotFormat  # noqa: F401
 from biosimulators_utils.report.data_model import ReportFormat, DataGeneratorVariableResults  # noqa: F401
 from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTimeCourseSimulation,  # noqa: F401
                                                   DataGeneratorVariable, DataGeneratorVariableSymbol)
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
-from biosimulators_utils.simulator.warnings import AlternateAlgorithmWarning
+from biosimulators_utils.simulator.data_model import AlgorithmSubstitutionPolicy
+from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
+from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
 import numpy
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
@@ -122,8 +125,11 @@ def exec_sed_task(task, variables):
     # override algorithm choice if there are events
     if integrator['id'] == 'LSODA' and model.__events__:
         model.mode_integrator = 'CVODE'
-        warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
-                      AlternateAlgorithmWarning)
+        if get_config().ALGORITHM_SUBSTITUTION_POLICY == AlgorithmSubstitutionPolicy.SAME_FRAMEWORK.value:
+            warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
+                          AlgorithmSubstitutedWarning)
+        else:
+            raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events')
 
     # setup time course
     model.sim_start = sim.initial_time

@@ -12,8 +12,10 @@ from biosimulators_utils.combine import data_model as combine_data_model
 from biosimulators_utils.combine.io import CombineArchiveWriter
 from biosimulators_utils.report import data_model as report_data_model
 from biosimulators_utils.report.io import ReportReader
+from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
 from biosimulators_utils.simulator.exec import exec_sedml_docs_in_archive_with_containerized_simulator
 from biosimulators_utils.simulator.specs import gen_algorithms_from_specs
+from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
 from biosimulators_utils.sedml import data_model as sedml_data_model
 from biosimulators_utils.sedml.io import SedmlSimulationWriter
 from biosimulators_utils.sedml.utils import append_all_nested_children_to_doc
@@ -23,6 +25,7 @@ import dateutil.tz
 import numpy
 import numpy.testing
 import os
+import pysces
 import shutil
 import tempfile
 import unittest
@@ -323,6 +326,47 @@ class CliTestCase(unittest.TestCase):
 
         self.assertFalse(numpy.any(numpy.isnan(report)))
 
+    def test_algorithm_substitution(self):
+        doc, archive_filename = self._build_combine_archive()
+
+        out_dir = self.dirname
+
+        # NONE
+        env = {'ALGORITHM_SUBSTITUTION_POLICY': 'NONE'}
+
+        original_pysces_model = pysces.model
+
+        def pysces_model(filename):
+            model = original_pysces_model(filename)
+            model.__events__ = True
+            return model
+
+        with mock.patch.dict(os.environ, env):
+            with mock.patch('pysces.model', side_effect=pysces_model):
+                with self.assertRaises(AlgorithmDoesNotSupportModelFeatureException):
+                    core.exec_sedml_docs_in_combine_archive(archive_filename, out_dir,
+                                                            report_formats=[
+                                                                report_data_model.ReportFormat.h5,
+                                                                report_data_model.ReportFormat.csv,
+                                                            ],
+                                                            bundle_outputs=True,
+                                                            keep_individual_outputs=True)
+
+        # SAME FRAMEWORK
+        env = {'ALGORITHM_SUBSTITUTION_POLICY': 'SAME_FRAMEWORK'}
+        with mock.patch.dict(os.environ, env):
+            with mock.patch('pysces.model', side_effect=pysces_model):
+                with mock.patch.object(pysces.PyscesModel.PysMod, 'Simulate', side_effect=Exception('Stop')):
+                    with self.assertRaisesRegex(Exception, '^Stop$'):
+                        with self.assertWarns(AlgorithmSubstitutedWarning):
+                            core.exec_sedml_docs_in_combine_archive(archive_filename, out_dir,
+                                                                    report_formats=[
+                                                                        report_data_model.ReportFormat.h5,
+                                                                        report_data_model.ReportFormat.csv,
+                                                                    ],
+                                                                    bundle_outputs=True,
+                                                                    keep_individual_outputs=True)
+
     def test_exec_sedml_docs_in_combine_archive_with_all_algorithms(self):
         for alg in gen_algorithms_from_specs(os.path.join(os.path.dirname(__file__), '..', 'biosimulators.json')).values():
             doc, archive_filename = self._build_combine_archive(algorithm=alg)
@@ -381,7 +425,8 @@ class CliTestCase(unittest.TestCase):
         exec_sedml_docs_in_archive_with_containerized_simulator(
             archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
 
-        report = ReportReader().run(out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1', format=report_data_model.ReportFormat.h5)
+        report = ReportReader().run(out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1',
+                                    format=report_data_model.ReportFormat.h5)
 
         self.assertEqual(set(report.index), set(['time', 'FeDuo']))
 
