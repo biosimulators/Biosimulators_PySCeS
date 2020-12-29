@@ -14,6 +14,7 @@ from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTi
                                                   DataGeneratorVariable, DataGeneratorVariableSymbol)
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
+import numpy
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
 import pysces  # noqa: E402
@@ -131,8 +132,6 @@ def exec_sed_task(task, variables):
         / (sim.output_end_time - sim.output_start_time)
         + 1
     )
-    if integrator['id'] == 'LSODA' and model.__events__:
-        model.sim_points -= 1
     if model.sim_points != int(model.sim_points):
         raise NotImplementedError('Time course must specify an integer number of time points')
 
@@ -145,11 +144,23 @@ def exec_sed_task(task, variables):
     unpredicted_targets = []
     results, labels = model.data_sim.getAllSimData(lbls=True)
     labels = {label: i_label for i_label, label in enumerate(labels)}
+
+    desired_time_points = numpy.linspace(sim.output_start_time, sim.output_end_time, sim.number_of_points + 1)
+    saved_time_points = model.data_sim.getTime()
+    time_step = (sim.output_end_time - sim.output_start_time) / sim.number_of_points
+    diff_saved_time_points = numpy.concatenate((numpy.diff(saved_time_points), numpy.array([time_step])))
+    i_times = []
+    eps = numpy.finfo(saved_time_points.dtype).eps * 2
+    for time in desired_time_points:
+        i_time = numpy.where(numpy.logical_and(saved_time_points >= time - eps, diff_saved_time_points > 0))[0][0]
+        i_times.append(i_time)
+    i_times = numpy.array(i_times)
+
     for variable in variables:
         if variable.symbol:
             if variable.symbol == DataGeneratorVariableSymbol.time:
                 i_result = labels['Time']
-                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
+                variable_results[variable.id] = results[:, i_result][i_times]
             else:
                 unpredicted_symbols.append(variable.symbol)
 
@@ -159,7 +170,7 @@ def exec_sed_task(task, variables):
             if i_result is None:
                 unpredicted_targets.append(variable.target)
             else:
-                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
+                variable_results[variable.id] = results[:, i_result][i_times]
 
     if unpredicted_symbols:
         raise NotImplementedError("".join([

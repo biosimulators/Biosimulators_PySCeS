@@ -369,3 +369,26 @@ class CliTestCase(unittest.TestCase):
             archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
 
         self._assert_combine_archive_outputs(doc, out_dir)
+
+    def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
+        archive_filename = os.path.join(os.path.dirname(__file__), 'fixtures', 'Parmar-BMC-Syst-Biol-2017-iron-distribution.omex')
+        out_dir = os.path.join(self.dirname, 'out')
+        docker_image = self.DOCKER_IMAGE
+        env = {
+            'REPORT_FORMATS': 'h5'
+        }
+
+        exec_sedml_docs_in_archive_with_containerized_simulator(
+            archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
+
+        report = ReportReader().run(out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1', format=report_data_model.ReportFormat.h5)
+
+        self.assertEqual(set(report.index), set(['time', 'FeDuo']))
+
+        self.assertEqual(report.shape, (2, 300 + 1))
+        numpy.testing.assert_almost_equal(
+            report.loc['time', :].to_numpy(),
+            numpy.linspace(0., 5100., 300 + 1),
+        )
+
+        self.assertFalse(numpy.any(numpy.isnan(report)))
