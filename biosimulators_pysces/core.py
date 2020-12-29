@@ -129,9 +129,10 @@ def exec_sed_task(task, variables):
         sim.number_of_points
         * (sim.output_end_time - sim.initial_time)
         / (sim.output_end_time - sim.output_start_time)
+        + 1
     )
-    if model.mode_integrator == 'LSODA':
-        model.sim_points += 1
+    if integrator['id'] == 'LSODA' and model.__events__:
+        model.sim_points -= 1
     if model.sim_points != int(model.sim_points):
         raise NotImplementedError('Time course must specify an integer number of time points')
 
