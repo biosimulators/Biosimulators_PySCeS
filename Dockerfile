@@ -67,6 +67,9 @@ RUN pip install /root/Biosimulators_PySCeS \
     && mv /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /Pysces/.pys_usercfg.ini \
     && rm -rf /root/Biosimulators_PySCeS
 
+# supported environment variables
+ENV ALGORITHM_SUBSTITUTION_POLICY=SAME_FRAMEWORK
+
 # Entrypoint
 ENTRYPOINT ["pysces"]
 CMD []
