@@ -14,6 +14,7 @@ from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTi
                                                   DataGeneratorVariable, DataGeneratorVariableSymbol)
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
+from biosimulators_utils.simulator.warnings import AlternateAlgorithmWarning
 import numpy
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
@@ -121,7 +122,8 @@ def exec_sed_task(task, variables):
     # override algorithm choice if there are events
     if integrator['id'] == 'LSODA' and model.__events__:
         model.mode_integrator = 'CVODE'
-        warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events', UserWarning)
+        warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
+                      AlternateAlgorithmWarning)
 
     # setup time course
     model.sim_start = sim.initial_time
