@@ -353,7 +353,7 @@ class CliTestCase(unittest.TestCase):
                                                             keep_individual_outputs=True)
 
         # SAME FRAMEWORK
-        env = {'ALGORITHM_SUBSTITUTION_POLICY': 'SAME_FRAMEWORK'}
+        env = {'ALGORITHM_SUBSTITUTION_POLICY': 'SIMILAR_VARIABLES'}
         with mock.patch.dict(os.environ, env):
             with mock.patch('pysces.model', side_effect=pysces_model):
                 with mock.patch.object(pysces.PyscesModel.PysMod, 'Simulate', side_effect=Exception('Stop')):

@@ -1,3 +1,3 @@
-biosimulators_utils >= 0.1.26
+biosimulators_utils >= 0.1.27
 numpy
 pysces

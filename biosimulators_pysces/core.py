@@ -128,7 +128,7 @@ def exec_sed_task(task, variables):
         substitution_policy = get_algorithm_substitution_policy()
         if (
             ALGORITHM_SUBSTITUTION_POLICY_LEVELS[substitution_policy]
-            >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SAME_FRAMEWORK]
+            >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SIMILAR_VARIABLES]
         ):
             warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
                           AlgorithmSubstitutedWarning)
