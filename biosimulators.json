@@ -3,10 +3,12 @@
   "name": "PySceS",
   "version": "0.9.9",
   "description": "Simulation and analysis tools for modelling biological systems",
-  "urls": [{
-    "type": "Home page",
-    "url": "http://pysces.sourceforge.net/"
-  }],
+  "urls": [
+    {
+      "type": "Home page",
+      "url": "http://pysces.sourceforge.net/"
+    }
+  ],
   "image": {
     "url": "ghcr.io/biosimulators/biosimulators_pysces/pysces:0.9.9",
     "format": {
@@ -17,7 +19,8 @@
     },
     "operatingSystemType": "Linux"
   },
-  "authors": [{
+  "authors": [
+    {
       "firstName": "Brett",
       "middleName": "G.",
       "lastName": "Olivier",
@@ -49,7 +52,8 @@
     }
   ],
   "references": {
-    "identifiers": [{
+    "identifiers": [
+      {
         "namespace": "pypi",
         "id": "pysces",
         "url": "https://pypi.org/project/pysces/"
@@ -65,65 +69,83 @@
         "url": "https://bio.tools/pysces"
       }
     ],
-    "citations": [{
-      "title": "Modelling cellular systems with PySCeS",
-      "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
-      "journal": "Bioinformatics",
-      "volume": 21,
-      "issue": 4,
-      "pages": "560-561",
-      "year": 2005,
-      "identifiers": [{
-        "namespace": "doi",
-        "id": "10.1093/bioinformatics/bti046",
-        "url": "https://doi.org/10.1093/bioinformatics/bti046"
-      }]
-    }]
+    "citations": [
+      {
+        "title": "Modelling cellular systems with PySCeS",
+        "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
+        "journal": "Bioinformatics",
+        "volume": 21,
+        "issue": 4,
+        "pages": "560-561",
+        "year": 2005,
+        "identifiers": [
+          {
+            "namespace": "doi",
+            "id": "10.1093/bioinformatics/bti046",
+            "url": "https://doi.org/10.1093/bioinformatics/bti046"
+          }
+        ]
+      }
+    ]
   },
   "license": {
     "namespace": "SPDX",
     "id": "BSD-3-Clause"
   },
-  "algorithms": [{
+  "algorithms": [
+    {
       "id": "lsoda",
       "name": "Livermore solver systems for ordinary differential equations with automatic method switching",
       "kisaoId": {
         "namespace": "KISAO",
         "id": "KISAO_0000088"
       },
-      "modelingFrameworks": [{
-        "namespace": "SBO",
-        "id": "SBO_0000293"
-      }],
-      "modelFormats": [{
-        "namespace": "EDAM",
-        "id": "format_2585",
-        "version": null,
-        "supportedFeatures": []
-      }],
-      "simulationFormats": [{
-        "namespace": "EDAM",
-        "id": "format_3685",
-        "version": "L1V3",
-        "supportedFeatures": []
-      }],
-      "archiveFormats": [{
-        "namespace": "EDAM",
-        "id": "format_3686",
-        "version": null,
-        "supportedFeatures": []
-      }],
-      "citations": [{
-        "title": "LSODA, ordinary differential equation solver for stiff or non-stiff system",
-        "authors": "Alan C. Hindmarsh & Linda R. Petzold",
-        "year": 2005,
-        "identifiers": [{
-          "namespace": "inis",
-          "id": "RN:41086668",
-          "url": "https://inis.iaea.org/search/search.aspx?orig_q=RN:41086668"
-        }]
-      }],
-      "parameters": [{
+      "modelingFrameworks": [
+        {
+          "namespace": "SBO",
+          "id": "SBO_0000293"
+        }
+      ],
+      "modelFormats": [
+        {
+          "namespace": "EDAM",
+          "id": "format_2585",
+          "version": null,
+          "supportedFeatures": []
+        }
+      ],
+      "simulationFormats": [
+        {
+          "namespace": "EDAM",
+          "id": "format_3685",
+          "version": "L1V3",
+          "supportedFeatures": []
+        }
+      ],
+      "archiveFormats": [
+        {
+          "namespace": "EDAM",
+          "id": "format_3686",
+          "version": null,
+          "supportedFeatures": []
+        }
+      ],
+      "citations": [
+        {
+          "title": "LSODA, ordinary differential equation solver for stiff or non-stiff system",
+          "authors": "Alan C. Hindmarsh & Linda R. Petzold",
+          "year": 2005,
+          "identifiers": [
+            {
+              "namespace": "inis",
+              "id": "RN:41086668",
+              "url": "https://inis.iaea.org/search/search.aspx?orig_q=RN:41086668"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
           "kisaoId": {
             "namespace": "KISAO",
             "id": "KISAO_0000211"
@@ -133,7 +155,12 @@
           "type": "float",
           "value": "1.0e-12",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -145,7 +172,12 @@
           "type": "float",
           "value": "1.0e-7",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -157,7 +189,12 @@
           "type": "integer",
           "value": null,
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -169,7 +206,12 @@
           "type": "float",
           "value": null,
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -181,7 +223,12 @@
           "type": "float",
           "value": null,
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -193,7 +240,12 @@
           "type": "float",
           "value": null,
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -205,7 +257,12 @@
           "type": "integer",
           "value": "12",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -217,13 +274,20 @@
           "type": "integer",
           "value": "5",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         }
       ],
-      "dependentDimensions": [{
-        "namespace": "SIO",
-        "id": "SIO_000418"
-      }],
+      "dependentDimensions": [
+        {
+          "namespace": "SIO",
+          "id": "SIO_000418"
+        }
+      ],
       "dependentVariableTargetPatterns": [
         {
           "variables": "species concentrations",
@@ -234,7 +298,12 @@
           "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter/@value"
         }
       ],
-      "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
+      "availableSoftwareInterfaceTypes": [
+        "library",
+        "command-line application",
+        "desktop application",
+        "BioSimulators Docker image"
+      ],
       "dependencies": null
     },
     {
@@ -244,43 +313,56 @@
         "namespace": "KISAO",
         "id": "KISAO_0000019"
       },
-      "modelingFrameworks": [{
-        "namespace": "SBO",
-        "id": "SBO_0000293"
-      }],
-      "modelFormats": [{
-        "namespace": "EDAM",
-        "id": "format_2585",
-        "version": null,
-        "supportedFeatures": []
-      }],
-      "simulationFormats": [{
-        "namespace": "EDAM",
-        "id": "format_3685",
-        "version": "L1V3",
-        "supportedFeatures": []
-      }],
-      "archiveFormats": [{
-        "namespace": "EDAM",
-        "id": "format_3686",
-        "version": null,
-        "supportedFeatures": []
-      }],
-      "citations": [{
-        "title": "CVODE, a stiff/nonstiff ODE solver in C",
-        "authors": "Scott D. Cohen, Alan C. Hindmarsh & Paul F. Dubois",
-        "journal": "Computers in Physics",
-        "volume": 10,
-        "issue": 2,
-        "pages": "138-143",
-        "year": 1996,
-        "identifiers": [{
-          "namespace": "doi",
-          "id": "10.1063/1.4822377",
-          "url": "https://doi.org/10.1063/1.4822377"
-        }]
-      }],
-      "parameters": [{
+      "modelingFrameworks": [
+        {
+          "namespace": "SBO",
+          "id": "SBO_0000293"
+        }
+      ],
+      "modelFormats": [
+        {
+          "namespace": "EDAM",
+          "id": "format_2585",
+          "version": null,
+          "supportedFeatures": []
+        }
+      ],
+      "simulationFormats": [
+        {
+          "namespace": "EDAM",
+          "id": "format_3685",
+          "version": "L1V3",
+          "supportedFeatures": []
+        }
+      ],
+      "archiveFormats": [
+        {
+          "namespace": "EDAM",
+          "id": "format_3686",
+          "version": null,
+          "supportedFeatures": []
+        }
+      ],
+      "citations": [
+        {
+          "title": "CVODE, a stiff/nonstiff ODE solver in C",
+          "authors": "Scott D. Cohen, Alan C. Hindmarsh & Paul F. Dubois",
+          "journal": "Computers in Physics",
+          "volume": 10,
+          "issue": 2,
+          "pages": "138-143",
+          "year": 1996,
+          "identifiers": [
+            {
+              "namespace": "doi",
+              "id": "10.1063/1.4822377",
+              "url": "https://doi.org/10.1063/1.4822377"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
           "kisaoId": {
             "namespace": "KISAO",
             "id": "KISAO_0000211"
@@ -290,7 +372,12 @@
           "type": "float",
           "value": "1e-15",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -302,7 +389,12 @@
           "type": "float",
           "value": "1e-6",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -314,7 +406,12 @@
           "type": "float",
           "value": "1e-9",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -326,7 +423,12 @@
           "type": "boolean",
           "value": "true",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         },
         {
           "kisaoId": {
@@ -338,13 +440,20 @@
           "type": "integer",
           "value": "1000",
           "recommendedRange": null,
-          "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"]
+          "availableSoftwareInterfaceTypes": [
+            "library",
+            "command-line application",
+            "desktop application",
+            "BioSimulators Docker image"
+          ]
         }
       ],
-      "dependentDimensions": [{
-        "namespace": "SIO",
-        "id": "SIO_000418"
-      }],
+      "dependentDimensions": [
+        {
+          "namespace": "SIO",
+          "id": "SIO_000418"
+        }
+      ],
       "dependentVariableTargetPatterns": [
         {
           "variables": "species concentrations",
@@ -355,22 +464,38 @@
           "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter/@value"
         }
       ],
-      "availableSoftwareInterfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
-      "dependencies": [{
-        "name": "SUNDIALS",
-        "version": null,
-        "required": true,
-        "freeNonCommercialLicense": true,
-        "url": "https://computing.llnl.gov/projects/sundials"
-      }]
+      "availableSoftwareInterfaceTypes": [
+        "library",
+        "command-line application",
+        "desktop application",
+        "BioSimulators Docker image"
+      ],
+      "dependencies": [
+        {
+          "name": "SUNDIALS",
+          "version": null,
+          "required": true,
+          "freeNonCommercialLicense": true,
+          "url": "https://computing.llnl.gov/projects/sundials"
+        }
+      ]
     }
   ],
-  "interfaceTypes": ["library", "command-line application", "desktop application", "BioSimulators Docker image"],
-  "supportedOperatingSystemTypes": ["platform-independent"],
-  "supportedProgrammingLanguages": [{
-    "namespace": "Linguist",
-    "id": "Python"
-  }],
+  "interfaceTypes": [
+    "library",
+    "command-line application",
+    "desktop application",
+    "BioSimulators Docker image"
+  ],
+  "supportedOperatingSystemTypes": [
+    "platform-independent"
+  ],
+  "supportedProgrammingLanguages": [
+    {
+      "namespace": "Linguist",
+      "id": "Python"
+    }
+  ],
   "funding": [],
   "biosimulators": {
     "specificationVersion": "1.0.0",
