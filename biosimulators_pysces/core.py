@@ -14,10 +14,12 @@ from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTi
                                                   DataGeneratorVariable, DataGeneratorVariableSymbol)
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
+from biosimulators_utils.sedml.exec import exec_sed_doc
 from biosimulators_utils.simulator.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION_POLICY_LEVELS
 from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
 from biosimulators_utils.simulator.utils import get_algorithm_substitution_policy
 from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
+import functools
 import numpy
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
@@ -49,7 +51,8 @@ def exec_sedml_docs_in_combine_archive(archive_filename, out_dir,
         bundle_outputs (:obj:`bool`, optional): if :obj:`True`, bundle outputs into archives for reports and plots
         keep_individual_outputs (:obj:`bool`, optional): if :obj:`True`, keep individual output files
     """
-    exec_sedml_docs_in_archive(archive_filename, exec_sed_task, out_dir,
+    sed_doc_executer = functools.partial(exec_sed_doc, exec_sed_task)
+    exec_sedml_docs_in_archive(sed_doc_executer, archive_filename, out_dir,
                                apply_xml_model_changes=True,
                                report_formats=report_formats,
                                plot_formats=plot_formats,
