@@ -1,7 +1,7 @@
 # Base OS
 FROM continuumio/miniconda3:4.9.2
 
-ARG VERSION=0.1.5
+ARG VERSION=0.1.6
 ARG SIMULATOR_VERSION="0.9.9"
 ARG PYTHON_VERSION=3.7
 
@@ -68,7 +68,8 @@ RUN pip install /root/Biosimulators_PySCeS \
     && rm -rf /root/Biosimulators_PySCeS
 
 # supported environment variables
-ENV ALGORITHM_SUBSTITUTION_POLICY=SIMILAR_VARIABLES
+ENV ALGORITHM_SUBSTITUTION_POLICY=SIMILAR_VARIABLES \
+    VERBOSE=0
 
 # Entrypoint
 ENTRYPOINT ["pysces"]

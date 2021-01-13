@@ -8,6 +8,7 @@
 
 from .data_model import KISAO_ALGORITHM_MAP
 from biosimulators_utils.combine.exec import exec_sedml_docs_in_archive
+from biosimulators_utils.log.data_model import CombineArchiveLog, TaskLog  # noqa: F401
 from biosimulators_utils.plot.data_model import PlotFormat  # noqa: F401
 from biosimulators_utils.report.data_model import ReportFormat, DataGeneratorVariableResults  # noqa: F401
 from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTimeCourseSimulation,  # noqa: F401
@@ -50,26 +51,35 @@ def exec_sedml_docs_in_combine_archive(archive_filename, out_dir,
         plot_formats (:obj:`list` of :obj:`PlotFormat`, optional): report format (e.g., pdf)
         bundle_outputs (:obj:`bool`, optional): if :obj:`True`, bundle outputs into archives for reports and plots
         keep_individual_outputs (:obj:`bool`, optional): if :obj:`True`, keep individual output files
+
+    Returns:
+        :obj:`CombineArchiveLog`: log
     """
     sed_doc_executer = functools.partial(exec_sed_doc, exec_sed_task)
-    exec_sedml_docs_in_archive(sed_doc_executer, archive_filename, out_dir,
-                               apply_xml_model_changes=True,
-                               report_formats=report_formats,
-                               plot_formats=plot_formats,
-                               bundle_outputs=bundle_outputs,
-                               keep_individual_outputs=keep_individual_outputs)
+    return exec_sedml_docs_in_archive(sed_doc_executer, archive_filename, out_dir,
+                                      apply_xml_model_changes=True,
+                                      report_formats=report_formats,
+                                      plot_formats=plot_formats,
+                                      bundle_outputs=bundle_outputs,
+                                      keep_individual_outputs=keep_individual_outputs)
 
 
-def exec_sed_task(task, variables):
+def exec_sed_task(task, variables, log=None):
     ''' Execute a task and save its results
 
     Args:
        task (:obj:`Task`): task
        variables (:obj:`list` of :obj:`DataGeneratorVariable`): variables that should be recorded
+       log (:obj:`TaskLog`, optional): log for the task
 
     Returns:
-        :obj:`DataGeneratorVariableResults`: results of variables
+        :obj:`tuple`:
+
+            :obj:`DataGeneratorVariableResults`: results of variables
+            :obj:`TaskLog`: log
     '''
+    log = log or TaskLog()
+
     validation.validate_task(task)
     validation.validate_model_language(task.model.language, ModelLanguage.SBML)
     validation.validate_model_change_types(task.model.changes, ())
@@ -208,5 +218,22 @@ def exec_sed_task(task, variables):
     # restore working directory
     os.chdir(cwd)
 
-    # return results
-    return variable_results
+    # log action
+    log.algorithm = 'KISAO_0000019' if model.mode_integrator == 'CVODE' else 'KISAO_0000088'
+
+    arguments = {}
+    for key, val in model.__settings__.items():
+        if model.mode_integrator == 'CVODE':
+            if key.startswith('cvode_'):
+                arguments[key] = val
+        else:
+            if key.startswith('lsoda_'):
+                arguments[key] = val
+
+    log.simulator_details = {
+        'method': model.Simulate.__module__ + '.' + model.Simulate.__name__,
+        'arguments': arguments,
+    }
+
+    # return results and log
+    return variable_results, log
