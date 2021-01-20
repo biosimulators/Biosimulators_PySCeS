@@ -10,9 +10,9 @@ from .data_model import KISAO_ALGORITHM_MAP
 from biosimulators_utils.combine.exec import exec_sedml_docs_in_archive
 from biosimulators_utils.log.data_model import CombineArchiveLog, TaskLog  # noqa: F401
 from biosimulators_utils.plot.data_model import PlotFormat  # noqa: F401
-from biosimulators_utils.report.data_model import ReportFormat, DataGeneratorVariableResults  # noqa: F401
+from biosimulators_utils.report.data_model import ReportFormat, VariableResults  # noqa: F401
 from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTimeCourseSimulation,  # noqa: F401
-                                                  DataGeneratorVariable, DataGeneratorVariableSymbol)
+                                                  Variable, Symbol)
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
 from biosimulators_utils.sedml.exec import exec_sed_doc
@@ -69,13 +69,13 @@ def exec_sed_task(task, variables, log=None):
 
     Args:
        task (:obj:`Task`): task
-       variables (:obj:`list` of :obj:`DataGeneratorVariable`): variables that should be recorded
+       variables (:obj:`list` of :obj:`Variable`): variables that should be recorded
        log (:obj:`TaskLog`, optional): log for the task
 
     Returns:
         :obj:`tuple`:
 
-            :obj:`DataGeneratorVariableResults`: results of variables
+            :obj:`VariableResults`: results of variables
             :obj:`TaskLog`: log
     '''
     log = log or TaskLog()
@@ -83,10 +83,11 @@ def exec_sed_task(task, variables, log=None):
     validation.validate_task(task)
     validation.validate_model_language(task.model.language, ModelLanguage.SBML)
     validation.validate_model_change_types(task.model.changes, ())
+    validation.validate_model_changes(task.model.changes)
     validation.validate_simulation_type(task.simulation, (UniformTimeCourseSimulation, ))
     validation.validate_uniform_time_course_simulation(task.simulation)
     validation.validate_data_generator_variables(variables)
-    target_x_paths_to_sbml_ids = validation.validate_data_generator_variable_xpaths(variables, task.model.source, attr='id')
+    target_x_paths_to_sbml_ids = validation.validate_variable_xpaths(variables, task.model.source, attr='id')
 
     # Get the current working directory because PySCeS opaquely changes it
     cwd = os.getcwd()
@@ -164,7 +165,7 @@ def exec_sed_task(task, variables, log=None):
     model.Simulate()
 
     # extract results
-    variable_results = DataGeneratorVariableResults()
+    variable_results = VariableResults()
     unpredicted_symbols = []
     unpredicted_targets = []
     results, labels = model.data_sim.getAllSimData(lbls=True)
@@ -183,7 +184,7 @@ def exec_sed_task(task, variables, log=None):
 
     for variable in variables:
         if variable.symbol:
-            if variable.symbol == DataGeneratorVariableSymbol.time:
+            if variable.symbol == Symbol.time:
                 i_result = labels['Time']
                 variable_results[variable.id] = results[:, i_result][i_times]
             else:
@@ -202,7 +203,7 @@ def exec_sed_task(task, variables, log=None):
             "The following variable symbols are not supported:\n  - {}\n\n".format(
                 '\n  - '.join(sorted(unpredicted_symbols)),
             ),
-            "Symbols must be one of the following:\n  - {}".format(DataGeneratorVariableSymbol.time),
+            "Symbols must be one of the following:\n  - {}".format(Symbol.time),
         ]))
 
     if unpredicted_targets:

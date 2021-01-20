@@ -66,10 +66,10 @@ class CliTestCase(unittest.TestCase):
         )
 
         variables = [
-            sedml_data_model.DataGeneratorVariable(id='time', symbol=sedml_data_model.DataGeneratorVariableSymbol.time),
-            sedml_data_model.DataGeneratorVariable(id='AL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']"),
-            sedml_data_model.DataGeneratorVariable(id='BLL', target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]'),
-            sedml_data_model.DataGeneratorVariable(id='IL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']"),
+            sedml_data_model.Variable(id='time', symbol=sedml_data_model.Symbol.time, task=task),
+            sedml_data_model.Variable(id='AL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']", task=task),
+            sedml_data_model.Variable(id='BLL', target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]', task=task),
+            sedml_data_model.Variable(id='IL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']", task=task),
         ]
 
         variable_results, _ = core.exec_sed_task(task, variables)
@@ -109,10 +109,10 @@ class CliTestCase(unittest.TestCase):
         )
 
         variables = [
-            sedml_data_model.DataGeneratorVariable(id='time', symbol=sedml_data_model.DataGeneratorVariableSymbol.time),
-            sedml_data_model.DataGeneratorVariable(id='AL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']"),
-            sedml_data_model.DataGeneratorVariable(id='BLL', target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]'),
-            sedml_data_model.DataGeneratorVariable(id='IL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']"),
+            sedml_data_model.Variable(id='time', symbol=sedml_data_model.Symbol.time, task=task),
+            sedml_data_model.Variable(id='AL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']", task=task),
+            sedml_data_model.Variable(id='BLL', target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]', task=task),
+            sedml_data_model.Variable(id='IL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']", task=task),
         ]
 
         # Configure task
@@ -150,7 +150,7 @@ class CliTestCase(unittest.TestCase):
         variables[0].symbol += '*'
         with self.assertRaisesRegex(NotImplementedError, 'symbols are not supported'):
             core.exec_sed_task(task, variables)
-        variables[0].symbol = sedml_data_model.DataGeneratorVariableSymbol.time
+        variables[0].symbol = sedml_data_model.Symbol.time
 
         variables[1].target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='kf_0']"
         with self.assertRaisesRegex(ValueError, 'targets could not be recorded'):
@@ -237,11 +237,10 @@ class CliTestCase(unittest.TestCase):
         doc.data_generators.append(sedml_data_model.DataGenerator(
             id='data_gen_time',
             variables=[
-                sedml_data_model.DataGeneratorVariable(
+                sedml_data_model.Variable(
                     id='var_time',
-                    symbol=sedml_data_model.DataGeneratorVariableSymbol.time,
+                    symbol=sedml_data_model.Symbol.time,
                     task=doc.tasks[0],
-                    model=doc.models[0],
                 ),
             ],
             math='var_time',
@@ -249,11 +248,10 @@ class CliTestCase(unittest.TestCase):
         doc.data_generators.append(sedml_data_model.DataGenerator(
             id='data_gen_AL',
             variables=[
-                sedml_data_model.DataGeneratorVariable(
+                sedml_data_model.Variable(
                     id='var_AL',
                     target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']",
                     task=doc.tasks[0],
-                    model=doc.models[0],
                 ),
             ],
             math='var_AL',
@@ -261,11 +259,10 @@ class CliTestCase(unittest.TestCase):
         doc.data_generators.append(sedml_data_model.DataGenerator(
             id='data_gen_BLL',
             variables=[
-                sedml_data_model.DataGeneratorVariable(
+                sedml_data_model.Variable(
                     id='var_BLL',
                     target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]',
                     task=doc.tasks[0],
-                    model=doc.models[0],
                 ),
             ],
             math='var_BLL',
@@ -273,11 +270,10 @@ class CliTestCase(unittest.TestCase):
         doc.data_generators.append(sedml_data_model.DataGenerator(
             id='data_gen_IL',
             variables=[
-                sedml_data_model.DataGeneratorVariable(
+                sedml_data_model.Variable(
                     id='var_IL',
                     target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']",
                     task=doc.tasks[0],
-                    model=doc.models[0],
                 ),
             ],
             math='var_IL',
