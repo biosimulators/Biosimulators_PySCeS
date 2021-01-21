@@ -295,33 +295,37 @@ class CliTestCase(unittest.TestCase):
     def _assert_combine_archive_outputs(self, doc, out_dir):
         self.assertEqual(set(['reports.h5', 'reports.zip', 'sim_1.sedml']).difference(set(os.listdir(out_dir))), set())
 
-        # check HDF report
-        report = ReportReader().run(out_dir, 'sim_1.sedml/report_1', format=report_data_model.ReportFormat.h5)
+        report = doc.outputs[0]
 
-        self.assertEqual(sorted(report.index), sorted([d.label for d in doc.outputs[0].data_sets]))
+        # check HDF report
+        report_results = ReportReader().run(report, out_dir, 'sim_1.sedml/report_1', format=report_data_model.ReportFormat.h5)
+
+        self.assertEqual(sorted(report_results.keys()), sorted([d.id for d in doc.outputs[0].data_sets]))
 
         sim = doc.tasks[0].simulation
-        self.assertEqual(report.shape, (len(doc.outputs[0].data_sets), sim.number_of_points + 1))
+        self.assertEqual(len(report_results[report.data_sets[0].id]), sim.number_of_points + 1)
         numpy.testing.assert_almost_equal(
-            report.loc['Time', :].to_numpy(),
+            report_results[report.data_sets[0].id],
             numpy.linspace(sim.output_start_time, sim.output_end_time, sim.number_of_points + 1),
         )
 
-        self.assertFalse(numpy.any(numpy.isnan(report)))
+        for data_set_result in report_results.values():
+            self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
 
         # check CSV report
-        report = ReportReader().run(out_dir, 'sim_1.sedml/report_1', format=report_data_model.ReportFormat.csv)
+        report_results = ReportReader().run(report, out_dir, 'sim_1.sedml/report_1', format=report_data_model.ReportFormat.csv)
 
-        self.assertEqual(sorted(report.index), sorted([d.label for d in doc.outputs[0].data_sets]))
+        self.assertEqual(sorted(report_results.keys()), sorted([d.id for d in doc.outputs[0].data_sets]))
 
         sim = doc.tasks[0].simulation
-        self.assertEqual(report.shape, (len(doc.outputs[0].data_sets), sim.number_of_points + 1))
+        self.assertEqual(len(report_results[report.data_sets[0].id]), sim.number_of_points + 1)
         numpy.testing.assert_almost_equal(
-            report.loc['Time', :].to_numpy(),
+            report_results[report.data_sets[0].id],
             numpy.linspace(sim.output_start_time, sim.output_end_time, sim.number_of_points + 1),
         )
 
-        self.assertFalse(numpy.any(numpy.isnan(report)))
+        for data_set_result in report_results.values():
+            self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
 
     def test_algorithm_substitution(self):
         doc, archive_filename = self._build_combine_archive()
@@ -422,15 +426,23 @@ class CliTestCase(unittest.TestCase):
         exec_sedml_docs_in_archive_with_containerized_simulator(
             archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
 
-        report = ReportReader().run(out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1',
-                                    format=report_data_model.ReportFormat.h5)
+        report = sedml_data_model.Report(
+            data_sets=[
+                sedml_data_model.DataSet(id='time', label='time'),
+                sedml_data_model.DataSet(id='FeDuo', label='FeDuo'),
+            ]
+        )
 
-        self.assertEqual(set(report.index), set(['time', 'FeDuo']))
+        report_results = ReportReader().run(report, out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1',
+                                            format=report_data_model.ReportFormat.h5)
 
-        self.assertEqual(report.shape, (2, 300 + 1))
+        self.assertEqual(set(report_results.keys()), set(['time', 'FeDuo']))
+
+        self.assertEqual(len(report_results['time']), 300 + 1)
         numpy.testing.assert_almost_equal(
-            report.loc['time', :].to_numpy(),
+            report_results['time'],
             numpy.linspace(0., 5100., 300 + 1),
         )
 
-        self.assertFalse(numpy.any(numpy.isnan(report)))
+        for data_set_result in report_results.values():
+            self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
