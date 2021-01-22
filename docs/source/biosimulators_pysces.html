@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>biosimulators_pysces package &#8212; BioSimulators-PySCeS 0.1.5 documentation</title>
+    <title>biosimulators_pysces package &#8212; BioSimulators-PySCeS 0.1.6 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -130,20 +130,22 @@
 </dl>
 <dl class="py function">
 <dt id="biosimulators_pysces.core.exec_sed_task">
-<code class="sig-prename descclassname">biosimulators_pysces.core.</code><code class="sig-name descname">exec_sed_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">variables</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/biosimulators/Biosimulators_PySCeS/blob/dev/biosimulators_pysces/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#biosimulators_pysces.core.exec_sed_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">biosimulators_pysces.core.</code><code class="sig-name descname">exec_sed_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">variables</span></em>, <em class="sig-param"><span class="n">log</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/biosimulators/Biosimulators_PySCeS/blob/dev/biosimulators_pysces/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#biosimulators_pysces.core.exec_sed_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a task and save its results</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>task</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Task</span></code>) – task</p></li>
 <li><p><strong>variables</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">DataGeneratorVariable</span></code>) – variables that should be recorded</p></li>
+<li><p><strong>log</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskLog</span></code>, optional) – log for the task</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>results of variables</p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataGeneratorVariableResults</span></code>: results of variables
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskLog</span></code>: log</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataGeneratorVariableResults</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -169,6 +171,12 @@ with reports at keys <code class="docutils literal notranslate"><span class="pre
 <li><p><strong>bundle_outputs</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, bundle outputs into archives for reports and plots</p></li>
 <li><p><strong>keep_individual_outputs</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – if <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, keep individual output files</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>log</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CombineArchiveLog</span></code></p>
 </dd>
 </dl>
 </dd></dl>
