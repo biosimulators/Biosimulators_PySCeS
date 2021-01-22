@@ -401,7 +401,9 @@ class CliTestCase(unittest.TestCase):
 
     def _get_combine_archive_exec_env(self):
         return {
-            'REPORT_FORMATS': 'h5,csv'
+            'REPORT_FORMATS': 'h5,csv',
+            'BUNDLE_OUTPUTS': '1',
+            'KEEP_INDIVIDUAL_OUTPUTS': '1',
         }
 
     def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
@@ -428,19 +430,19 @@ class CliTestCase(unittest.TestCase):
 
         report = sedml_data_model.Report(
             data_sets=[
-                sedml_data_model.DataSet(id='time', label='time'),
-                sedml_data_model.DataSet(id='FeDuo', label='FeDuo'),
+                sedml_data_model.DataSet(id='data_set_time', label='time'),
+                sedml_data_model.DataSet(id='data_set_FeDuo', label='FeDuo'),
             ]
         )
 
         report_results = ReportReader().run(report, out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1',
                                             format=report_data_model.ReportFormat.h5)
 
-        self.assertEqual(set(report_results.keys()), set(['time', 'FeDuo']))
+        self.assertEqual(set(report_results.keys()), set(['data_set_time', 'data_set_FeDuo']))
 
-        self.assertEqual(len(report_results['time']), 300 + 1)
+        self.assertEqual(len(report_results['data_set_time']), 300 + 1)
         numpy.testing.assert_almost_equal(
-            report_results['time'],
+            report_results['data_set_time'],
             numpy.linspace(0., 5100., 300 + 1),
         )
 
