@@ -34,6 +34,9 @@ import unittest
 
 class CliTestCase(unittest.TestCase):
     DOCKER_IMAGE = 'ghcr.io/biosimulators/biosimulators_pysces/pysces:latest'
+    NAMESPACES = {
+        'sbml': 'http://www.sbml.org/sbml/level2/version4',
+    }
 
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
@@ -67,9 +70,22 @@ class CliTestCase(unittest.TestCase):
 
         variables = [
             sedml_data_model.Variable(id='time', symbol=sedml_data_model.Symbol.time, task=task),
-            sedml_data_model.Variable(id='AL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']", task=task),
-            sedml_data_model.Variable(id='BLL', target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]', task=task),
-            sedml_data_model.Variable(id='IL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']", task=task),
+            sedml_data_model.Variable(
+                id='AL',
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']",
+                target_namespaces=self.NAMESPACES,
+                task=task,
+            ),
+            sedml_data_model.Variable(
+                id='BLL',
+                target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]',
+                target_namespaces=self.NAMESPACES,
+                task=task),
+            sedml_data_model.Variable(
+                id='IL',
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']",
+                target_namespaces=self.NAMESPACES,
+                task=task),
         ]
 
         variable_results, _ = core.exec_sed_task(task, variables)
@@ -109,10 +125,23 @@ class CliTestCase(unittest.TestCase):
         )
 
         variables = [
-            sedml_data_model.Variable(id='time', symbol=sedml_data_model.Symbol.time, task=task),
-            sedml_data_model.Variable(id='AL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']", task=task),
-            sedml_data_model.Variable(id='BLL', target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]', task=task),
-            sedml_data_model.Variable(id='IL', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']", task=task),
+            sedml_data_model.Variable(
+                id='time', symbol=sedml_data_model.Symbol.time, task=task),
+            sedml_data_model.Variable(
+                id='AL',
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']",
+                target_namespaces=self.NAMESPACES,
+                task=task),
+            sedml_data_model.Variable(
+                id='BLL',
+                target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]',
+                target_namespaces=self.NAMESPACES,
+                task=task),
+            sedml_data_model.Variable(
+                id='IL',
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']",
+                target_namespaces=self.NAMESPACES,
+                task=task),
         ]
 
         # Configure task
@@ -251,6 +280,7 @@ class CliTestCase(unittest.TestCase):
                 sedml_data_model.Variable(
                     id='var_AL',
                     target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']",
+                    target_namespaces=self.NAMESPACES,
                     task=doc.tasks[0],
                 ),
             ],
@@ -262,6 +292,7 @@ class CliTestCase(unittest.TestCase):
                 sedml_data_model.Variable(
                     id='var_BLL',
                     target='/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="BLL"]',
+                    target_namespaces=self.NAMESPACES,
                     task=doc.tasks[0],
                 ),
             ],
@@ -273,6 +304,7 @@ class CliTestCase(unittest.TestCase):
                 sedml_data_model.Variable(
                     id='var_IL',
                     target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']",
+                    target_namespaces=self.NAMESPACES,
                     task=doc.tasks[0],
                 ),
             ],
