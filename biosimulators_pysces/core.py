@@ -149,6 +149,9 @@ def exec_sed_task(task, variables, log=None):
         else:
             raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events')
 
+    if model.mode_integrator == 'CVODE':
+        model.__settings__['cvode_return_event_timepoints'] = False
+
     # setup time course
     model.sim_start = sim.initial_time
     model.sim_end = sim.output_end_time
@@ -171,22 +174,11 @@ def exec_sed_task(task, variables, log=None):
     results, labels = model.data_sim.getAllSimData(lbls=True)
     labels = {label: i_label for i_label, label in enumerate(labels)}
 
-    desired_time_points = numpy.linspace(sim.output_start_time, sim.output_end_time, sim.number_of_points + 1)
-    saved_time_points = model.data_sim.getTime()
-    time_step = (sim.output_end_time - sim.output_start_time) / sim.number_of_points
-    diff_saved_time_points = numpy.concatenate((numpy.diff(saved_time_points), numpy.array([time_step])))
-    i_times = []
-    eps = numpy.finfo(saved_time_points.dtype).eps * 2
-    for time in desired_time_points:
-        i_time = numpy.where(numpy.logical_and(saved_time_points >= time - eps, diff_saved_time_points > 0))[0][0]
-        i_times.append(i_time)
-    i_times = numpy.array(i_times)
-
     for variable in variables:
         if variable.symbol:
             if variable.symbol == Symbol.time:
                 i_result = labels['Time']
-                variable_results[variable.id] = results[:, i_result][i_times]
+                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
             else:
                 unpredicted_symbols.append(variable.symbol)
 
@@ -196,7 +188,7 @@ def exec_sed_task(task, variables, log=None):
             if i_result is None:
                 unpredicted_targets.append(variable.target)
             else:
-                variable_results[variable.id] = results[:, i_result][i_times]
+                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
 
     if unpredicted_symbols:
         raise NotImplementedError("".join([
