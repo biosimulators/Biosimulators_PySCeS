@@ -21,7 +21,6 @@ from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportMode
 from biosimulators_utils.simulator.utils import get_algorithm_substitution_policy
 from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
 import functools
-import numpy
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
 import pysces  # noqa: E402
