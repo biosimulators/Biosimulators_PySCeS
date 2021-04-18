@@ -20,6 +20,7 @@ from biosimulators_utils.simulator.data_model import AlgorithmSubstitutionPolicy
 from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
 from biosimulators_utils.simulator.utils import get_algorithm_substitution_policy
 from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
+from biosimulators_utils.utils.core import raise_errors_warnings
 import functools
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
@@ -79,13 +80,23 @@ def exec_sed_task(task, variables, log=None):
     '''
     log = log or TaskLog()
 
-    validation.validate_task(task)
-    validation.validate_model_language(task.model.language, ModelLanguage.SBML)
-    validation.validate_model_change_types(task.model.changes, ())
-    validation.validate_model_changes(task.model.changes)
-    validation.validate_simulation_type(task.simulation, (UniformTimeCourseSimulation, ))
-    validation.validate_uniform_time_course_simulation(task.simulation)
-    validation.validate_data_generator_variables(variables)
+    model = task.model
+    sim = task.simulation
+
+    raise_errors_warnings(validation.validate_task(task),
+                          error_summary='Task `{}` is invalid.'.format(task.id))
+    raise_errors_warnings(validation.validate_model_language(task.model.language, ModelLanguage.SBML),
+                          error_summary='Language for model `{}` is not supported.'.format(model.id))
+    raise_errors_warnings(validation.validate_model_change_types(task.model.changes, ()),
+                          error_summary='Changes for model `{}` are not supported.'.format(model.id))
+    raise_errors_warnings(validation.validate_model_changes(task.model),
+                          error_summary='Changes for model `{}` are invalid.'.format(model.id))
+    raise_errors_warnings(validation.validate_simulation_type(task.simulation, (UniformTimeCourseSimulation, )),
+                          error_summary='{} `{}` is not supported.'.format(sim.__class__.__name__, sim.id))
+    raise_errors_warnings(validation.validate_simulation(task.simulation),
+                          error_summary='Simulation `{}` is invalid.'.format(sim.id))
+    raise_errors_warnings(validation.validate_data_generator_variables(variables),
+                          error_summary='Data generator variables for task `{}` are invalid.'.format(task.id))
     target_x_paths_to_sbml_ids = validation.validate_variable_xpaths(variables, task.model.source, attr='id')
 
     # Get the current working directory because PySCeS opaquely changes it

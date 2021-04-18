@@ -1,2 +1,2 @@
-biosimulators_utils[logging] >= 0.1.52
+biosimulators_utils[logging] >= 0.1.53
 pysces
