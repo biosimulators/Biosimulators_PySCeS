@@ -467,7 +467,7 @@ class CliTestCase(unittest.TestCase):
             ]
         )
 
-        report_results = ReportReader().run(report, out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/simulation_1',
+        report_results = ReportReader().run(report, out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/report_1',
                                             format=report_data_model.ReportFormat.h5)
 
         self.assertEqual(set(report_results.keys()), set(['data_set_time', 'data_set_FeDuo']))
