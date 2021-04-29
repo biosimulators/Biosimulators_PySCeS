@@ -7,13 +7,14 @@
 """
 
 from biosimulators_utils.data_model import ValueType
+import collections
 
 __all__ = [
     'KISAO_ALGORITHM_MAP',
 ]
 
-KISAO_ALGORITHM_MAP = {
-    'KISAO_0000019': {
+KISAO_ALGORITHM_MAP = collections.OrderedDict([
+    ('KISAO_0000019', {
         'id': 'CVODE',
         'settings': {
             "KISAO_0000211": {
@@ -47,8 +48,8 @@ KISAO_ALGORITHM_MAP = {
                 "value": 1000,
             },
         },
-    },
-    'KISAO_0000088': {
+    }),
+    ('KISAO_0000088', {
         'id': 'LSODA',
         'settings': {
             'KISAO_0000211': {
@@ -100,5 +101,5 @@ KISAO_ALGORITHM_MAP = {
                 'default': 5,
             },
         },
-    },
-}
+    }),
+])

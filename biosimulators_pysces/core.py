@@ -16,11 +16,12 @@ from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTi
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
 from biosimulators_utils.sedml.exec import exec_sed_doc
-from biosimulators_utils.simulator.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION_POLICY_LEVELS
 from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
 from biosimulators_utils.simulator.utils import get_algorithm_substitution_policy
-from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
 from biosimulators_utils.utils.core import raise_errors_warnings
+from kisao.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION_POLICY_LEVELS
+from kisao.utils import get_preferred_substitute_algorithm_by_ids
+from kisao.warnings import AlgorithmSubstitutedWarning
 import functools
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
@@ -93,7 +94,7 @@ def exec_sed_task(task, variables, log=None):
                           error_summary='Changes for model `{}` are invalid.'.format(model.id))
     raise_errors_warnings(validation.validate_simulation_type(task.simulation, (UniformTimeCourseSimulation, )),
                           error_summary='{} `{}` is not supported.'.format(sim.__class__.__name__, sim.id))
-    raise_errors_warnings(validation.validate_simulation(task.simulation),
+    raise_errors_warnings(*validation.validate_simulation(task.simulation),
                           error_summary='Simulation `{}` is invalid.'.format(sim.id))
     raise_errors_warnings(*validation.validate_data_generator_variables(variables),
                           error_summary='Data generator variables for task `{}` are invalid.'.format(task.id))
@@ -117,34 +118,31 @@ def exec_sed_task(task, variables, log=None):
 
     # Load the algorithm specified by `simulation.algorithm.kisao_id`
     sim = task.simulation
-    integrator = KISAO_ALGORITHM_MAP.get(sim.algorithm.kisao_id, None)
-    if integrator is None:
-        raise NotImplementedError("".join([
-            "Algorithm with KiSAO id '{}' is not supported. ".format(sim.algorithm.kisao_id),
-            "Algorithm must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
-                '{}: {}'.format(kisao_id, algorithm['id'])
-                for kisao_id, algorithm in KISAO_ALGORITHM_MAP.items())),
-        ]))
+    exec_kisao_id = get_preferred_substitute_algorithm_by_ids(
+        sim.algorithm.kisao_id, KISAO_ALGORITHM_MAP.keys(),
+        substitution_policy=get_algorithm_substitution_policy())
+    integrator = KISAO_ALGORITHM_MAP[exec_kisao_id]
     model.mode_integrator = integrator['id']
 
     # Apply the algorithm parameter changes specified by `task.simulation.algorithm.changes`
-    for change in sim.algorithm.changes:
-        setting = integrator['settings'].get(change.kisao_id, None)
-        if setting is None:
-            raise NotImplementedError("".join([
-                "Algorithm parameter with KiSAO id '{}' is not supported. ".format(change.kisao_id),
-                "Parameter must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
-                    '{}: {} ({})'.format(kisao_id, setting['id'], setting['name'])
-                    for kisao_id, setting in integrator['settings'].items())),
-            ]))
+    if exec_kisao_id == sim.algorithm.kisao_id:
+        for change in sim.algorithm.changes:
+            setting = integrator['settings'].get(change.kisao_id, None)
+            if setting is None:
+                raise NotImplementedError("".join([
+                    "Algorithm parameter with KiSAO id '{}' is not supported. ".format(change.kisao_id),
+                    "Parameter must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
+                        '{}: {} ({})'.format(kisao_id, setting['id'], setting['name'])
+                        for kisao_id, setting in integrator['settings'].items())),
+                ]))
 
-        value = change.new_value
-        if not validate_str_value(value, setting['type']):
-            raise ValueError("'{}' is not a valid {} value for parameter {}".format(
-                value, setting['type'].name, change.kisao_id))
+            value = change.new_value
+            if not validate_str_value(value, setting['type']):
+                raise ValueError("'{}' is not a valid {} value for parameter {}".format(
+                    value, setting['type'].name, change.kisao_id))
 
-        parsed_value = parse_value(value, setting['type'])
-        model.__settings__[setting['id']] = parsed_value
+            parsed_value = parse_value(value, setting['type'])
+            model.__settings__[setting['id']] = parsed_value
 
     # override algorithm choice if there are events
     if integrator['id'] == 'LSODA' and model.__events__:

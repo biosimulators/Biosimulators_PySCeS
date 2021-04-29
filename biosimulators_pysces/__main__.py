@@ -9,8 +9,8 @@
 from ._version import __version__
 from .core import exec_sedml_docs_in_combine_archive
 from biosimulators_utils.simulator.cli import build_cli
-from biosimulators_utils.simulator.data_model import AlgorithmSubstitutionPolicy
 from biosimulators_utils.simulator.environ import ENVIRONMENT_VARIABLES
+from kisao.data_model import AlgorithmSubstitutionPolicy
 import os
 cwd = os.getcwd()  # because PySCeS changes the working directory
 import pysces  # noqa: E402

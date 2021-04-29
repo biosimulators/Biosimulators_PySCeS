@@ -16,10 +16,11 @@ from biosimulators_utils.report.io import ReportReader
 from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
 from biosimulators_utils.simulator.exec import exec_sedml_docs_in_archive_with_containerized_simulator
 from biosimulators_utils.simulator.specs import gen_algorithms_from_specs
-from biosimulators_utils.simulator.warnings import AlgorithmSubstitutedWarning
 from biosimulators_utils.sedml import data_model as sedml_data_model
 from biosimulators_utils.sedml.io import SedmlSimulationWriter
 from biosimulators_utils.sedml.utils import append_all_nested_children_to_doc
+from kisao.exceptions import AlgorithmCannotBeSubstitutedException
+from kisao.warnings import AlgorithmSubstitutedWarning
 from unittest import mock
 import datetime
 import dateutil.tz
@@ -156,8 +157,8 @@ class CliTestCase(unittest.TestCase):
             core.exec_sed_task(task, [])
         task.model.source = os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000002.xml')
 
-        task.simulation.algorithm.kisao_id = 'KISAO_0000001'
-        with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
+        task.simulation.algorithm.kisao_id = 'KISAO_0000448'
+        with self.assertRaisesRegex(AlgorithmCannotBeSubstitutedException, 'No algorithm can be substituted'):
             core.exec_sed_task(task, variables)
         task.simulation.algorithm.kisao_id = 'KISAO_0000088'
 
