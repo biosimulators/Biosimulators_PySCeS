@@ -19,6 +19,7 @@ from biosimulators_utils.sedml.exec import exec_sed_doc
 from biosimulators_utils.simulator.exceptions import AlgorithmDoesNotSupportModelFeatureException
 from biosimulators_utils.simulator.utils import get_algorithm_substitution_policy
 from biosimulators_utils.utils.core import raise_errors_warnings
+from biosimulators_utils.warnings import warn, BioSimulatorsWarning
 from kisao.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION_POLICY_LEVELS
 from kisao.utils import get_preferred_substitute_algorithm_by_ids
 from kisao.warnings import AlgorithmSubstitutedWarning
@@ -28,7 +29,6 @@ cwd = os.getcwd()  # because PySCeS changes the working directory
 import pysces  # noqa: E402
 os.chdir(cwd)
 import tempfile  # noqa: E402
-import warnings  # noqa: E402
 
 
 __all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_task']
@@ -118,9 +118,10 @@ def exec_sed_task(task, variables, log=None):
 
     # Load the algorithm specified by `simulation.algorithm.kisao_id`
     sim = task.simulation
+    algorithm_substitution_policy = get_algorithm_substitution_policy()
     exec_kisao_id = get_preferred_substitute_algorithm_by_ids(
         sim.algorithm.kisao_id, KISAO_ALGORITHM_MAP.keys(),
-        substitution_policy=get_algorithm_substitution_policy())
+        substitution_policy=algorithm_substitution_policy)
     integrator = KISAO_ALGORITHM_MAP[exec_kisao_id]
     model.mode_integrator = integrator['id']
 
@@ -129,17 +130,41 @@ def exec_sed_task(task, variables, log=None):
         for change in sim.algorithm.changes:
             setting = integrator['settings'].get(change.kisao_id, None)
             if setting is None:
-                raise NotImplementedError("".join([
-                    "Algorithm parameter with KiSAO id '{}' is not supported. ".format(change.kisao_id),
-                    "Parameter must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
-                        '{}: {} ({})'.format(kisao_id, setting['id'], setting['name'])
-                        for kisao_id, setting in integrator['settings'].items())),
-                ]))
+                if (
+                    ALGORITHM_SUBSTITUTION_POLICY_LEVELS[algorithm_substitution_policy]
+                    <= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SAME_METHOD]
+                ):
+                    msg = "".join([
+                        "Algorithm parameter with KiSAO id '{}' is not supported. ".format(change.kisao_id),
+                        "Parameter must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
+                            '{}: {} ({})'.format(kisao_id, setting['id'], setting['name'])
+                            for kisao_id, setting in integrator['settings'].items())),
+                    ])
+                    raise NotImplementedError(msg)
+                else:
+                    msg = "".join([
+                        "Algorithm parameter with KiSAO id '{}' was ignored because it is not supported. ".format(change.kisao_id),
+                        "Parameter must have one of the following KiSAO ids:\n  - {}".format('\n  - '.join(
+                            '{}: {} ({})'.format(kisao_id, setting['id'], setting['name'])
+                            for kisao_id, setting in integrator['settings'].items())),
+                    ])
+                    warn(msg, BioSimulatorsWarning)
+                    continue
 
             value = change.new_value
             if not validate_str_value(value, setting['type']):
-                raise ValueError("'{}' is not a valid {} value for parameter {}".format(
-                    value, setting['type'].name, change.kisao_id))
+                if (
+                    ALGORITHM_SUBSTITUTION_POLICY_LEVELS[algorithm_substitution_policy]
+                    <= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SAME_METHOD]
+                ):
+                    msg = "'{}' is not a valid {} value for parameter {}".format(
+                        value, setting['type'].name, change.kisao_id)
+                    raise ValueError(msg)
+                else:
+                    msg = "'{}' was ignored because it is not a valid {} value for parameter {}".format(
+                        value, setting['type'].name, change.kisao_id)
+                    warn(msg, BioSimulatorsWarning)
+                    continue
 
             parsed_value = parse_value(value, setting['type'])
             model.__settings__[setting['id']] = parsed_value
@@ -152,8 +177,8 @@ def exec_sed_task(task, variables, log=None):
             ALGORITHM_SUBSTITUTION_POLICY_LEVELS[substitution_policy]
             >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SIMILAR_VARIABLES]
         ):
-            warnings.warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
-                          AlgorithmSubstitutedWarning)
+            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
+                 AlgorithmSubstitutedWarning)
         else:
             raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events')
 
