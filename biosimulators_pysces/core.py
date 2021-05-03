@@ -132,7 +132,7 @@ def exec_sed_task(task, variables, log=None):
             if setting is None:
                 if (
                     ALGORITHM_SUBSTITUTION_POLICY_LEVELS[algorithm_substitution_policy]
-                    <= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SAME_METHOD]
+                    <= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.NONE]
                 ):
                     msg = "".join([
                         "Algorithm parameter with KiSAO id '{}' is not supported. ".format(change.kisao_id),
@@ -155,7 +155,7 @@ def exec_sed_task(task, variables, log=None):
             if not validate_str_value(value, setting['type']):
                 if (
                     ALGORITHM_SUBSTITUTION_POLICY_LEVELS[algorithm_substitution_policy]
-                    <= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SAME_METHOD]
+                    <= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.NONE]
                 ):
                     msg = "'{}' is not a valid {} value for parameter {}".format(
                         value, setting['type'].name, change.kisao_id)
