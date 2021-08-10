@@ -16,7 +16,7 @@ cwd = os.getcwd()  # because PySCeS changes the working directory
 import pysces  # noqa: E402
 os.chdir(cwd)
 
-App = build_cli('pysces', __version__,
+App = build_cli('biosimulators-pysces', __version__,
                 'PySCeS', pysces.__version__, 'http://pysces.sourceforge.net/',
                 exec_sedml_docs_in_combine_archive,
                 environment_variables=[

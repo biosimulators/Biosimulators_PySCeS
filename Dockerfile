@@ -72,5 +72,5 @@ ENV ALGORITHM_SUBSTITUTION_POLICY=SIMILAR_VARIABLES \
     VERBOSE=0
 
 # Entrypoint
-ENTRYPOINT ["pysces"]
+ENTRYPOINT ["biosimulators-pysces"]
 CMD []

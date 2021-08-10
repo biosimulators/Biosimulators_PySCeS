@@ -48,7 +48,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'pysces = biosimulators_pysces.__main__:main',
+            'biosimulators-pysces = biosimulators_pysces.__main__:main',
         ],
     },
 )

@@ -28,7 +28,7 @@ docker pull ghcr.io/biosimulators/pysces
 
 ### Local usage
 ```
-usage: pysces [-h] [-d] [-q] -i ARCHIVE [-o OUT_DIR] [-v]
+usage: biosimulators-pysces [-h] [-d] [-q] -i ARCHIVE [-o OUT_DIR] [-v]
 
 BioSimulators-compliant command-line interface to the PySCeS simulation program <http://pysces.sourceforge.net/>.
 
