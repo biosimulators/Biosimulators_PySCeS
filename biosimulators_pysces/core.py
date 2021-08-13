@@ -25,10 +25,8 @@ from kisao.utils import get_preferred_substitute_algorithm_by_ids
 from kisao.warnings import AlgorithmSubstitutedWarning
 import functools
 import os
-cwd = os.getcwd()  # because PySCeS changes the working directory
-import pysces  # noqa: E402
-os.chdir(cwd)
-import tempfile  # noqa: E402
+import pysces
+import tempfile
 
 
 __all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_task']
