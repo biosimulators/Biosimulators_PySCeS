@@ -1,9 +1,8 @@
 # Base OS
-FROM continuumio/miniconda3:4.9.2
+FROM ghcr.io/biosimulators/biosimulators_pysces/pysces_base:latest
 
 ARG VERSION=0.1.17
 ARG SIMULATOR_VERSION="0.9.9"
-ARG PYTHON_VERSION=3.9
 
 # metadata
 LABEL \
@@ -17,7 +16,7 @@ LABEL \
     org.opencontainers.image.vendor="BioSimulators Team" \
     org.opencontainers.image.licenses="BSD-3-Clause" \
     \
-    base_image="continuumio/miniconda3:4.9.2" \
+    base_image="python:3.9-slim-buster" \
     version="${VERSION}" \
     software="PySCeS" \
     software.version="${SIMULATOR_VERSION}" \
@@ -30,35 +29,6 @@ LABEL \
     extra.identifiers.biotools="pysces" \
     maintainer="BioSimulators Team <info@biosimulators.org>"
 
-# Install requirements
-ENV CONDA_ENV=py \
-    PATH=/opt/conda/envs/py/bin:$PATH \
-    MPLBACKEND=PDF
-RUN conda update -y -n base -c defaults conda \
-    && conda create -y -n ${CONDA_ENV} python=${PYTHON_VERSION} \
-    && conda install --name ${CONDA_ENV} -y -c conda-forge \
-        assimulo \
-    && /bin/bash -c "source activate ${CONDA_ENV}" \
-    \
-    && apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        gfortran \
-    && pip install python-libsbml \
-    && pip install matplotlib \
-    \
-    && cd /tmp \
-    && git clone --branch assimulo https://github.com/PySCeS/pysces.git \
-    && cd pysces \
-    && pip install . \
-    \
-    && cd /tmp \
-    && rm -rf pysces \
-    \
-    && apt-get remove -y \
-        gfortran \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists
-
 # Copy code for command-line interface into image and install it
 COPY . /root/Biosimulators_PySCeS
 RUN pip install /root/Biosimulators_PySCeS \
@@ -69,7 +39,8 @@ RUN pip install /root/Biosimulators_PySCeS \
 
 # supported environment variables
 ENV ALGORITHM_SUBSTITUTION_POLICY=SIMILAR_VARIABLES \
-    VERBOSE=0
+    VERBOSE=0 \
+    MPLBACKEND=PDF
 
 # Entrypoint
 ENTRYPOINT ["biosimulators-pysces"]

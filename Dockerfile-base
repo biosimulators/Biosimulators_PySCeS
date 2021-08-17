@@ -1,0 +1,72 @@
+FROM python:3.9-slim-buster
+
+# install SUNDIALS
+ARG SUNDIALS_VERSION=2.6.2
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        wget \
+        cmake \
+        make \
+        g++ \
+    \
+    && cd /tmp \
+    && wget https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz \
+    && tar xvvf sundials-${SUNDIALS_VERSION}.tar.gz \
+    && cd sundials-${SUNDIALS_VERSION} \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make \
+    && make install \
+    \
+    && cd /tmp \
+    && rm sundials-${SUNDIALS_VERSION}.tar.gz \
+    && rm -r sundials-${SUNDIALS_VERSION} \
+    \
+    && apt-get remove -y \
+        wget \
+        cmake \
+        make \
+        g++ \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists
+
+# install Python requirements for assimulo
+RUN pip install cython numpy scipy matplotlib
+
+ARG ASSIMULO_VERSION=3.2.5
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        g++ \
+        gfortran \
+        liblas-dev \
+        liblapack-dev \
+        git \
+    \
+    && pip install git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION} \
+    \
+    && apt-get remove -y \
+        g++ \
+        gfortran \
+        liblas-dev \
+        liblapack-dev \
+        git \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists
+
+# install PySCeS
+ARG PYSCES_REVISION=470cd0b8afa4c14721a2b2bc00d4c71d80603801
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        git \
+        gcc \
+        gfortran \
+    \
+    && pip install git+https://github.com/PySCeS/pysces.git@${PYSCES_REVISION} \
+    \
+    && apt-get remove -y \
+        git \
+        gcc \
+        gfortran \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists
