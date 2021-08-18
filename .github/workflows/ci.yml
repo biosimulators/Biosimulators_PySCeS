@@ -197,7 +197,7 @@ jobs:
             registry: ${{ steps.get-docker-image-tag.outputs.dockerRegistry }}
             username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
             password: "${{ secrets.DOCKER_REGISTRY_TOKEN }}"
-            image_name: ghcr.io/biosimulators/biosimulators_pysces/pysces_base
+            image_name: biosimulators/biosimulators_pysces/pysces_base
             image_tag: ${{ steps.get-docker-image-tag.outputs.simulatorVersion }}
             build_extra_args: "--build-arg SIMULATOR_VERSION=${{ steps.get-docker-image-tag.outputs.simulatorVersion }}"
             dockerfile: Dockerfile-base
