@@ -92,8 +92,8 @@ jobs:
         env:
           SUNDIALS_VERSION: 2.6.2
         run: |
-          apt-get update -y
-          apt-get install -y --no-install-recommends \
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
               wget \
               cmake \
               make \
@@ -116,8 +116,8 @@ jobs:
         env:
           ASSIMULO_VERSION: 3.2.5
         run: |
-          apt-get update -y
-          apt-get install -y --no-install-recommends \
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
               g++ \
               gfortran \
               liblas-dev \
@@ -130,8 +130,8 @@ jobs:
         env:
           PYSCES_REVISION: 470cd0b8afa4c14721a2b2bc00d4c71d80603801
         run: |
-          apt-get update -y
-          apt-get install -y --no-install-recommends \
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
             git \
             gcc \
             gfortran
