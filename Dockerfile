@@ -36,6 +36,7 @@ RUN pip install /root/Biosimulators_PySCeS \
     && mkdir -p /Pysces/psc \
     && mkdir -p /root/Pysces \
     && mkdir -p /root/Pysces/psc \
+    && chmod ugo+rw -R /Pysces \
     && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /Pysces/.pys_usercfg.ini \
     && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /root/Pysces/.pys_usercfg.ini \
     && rm -rf /root/Biosimulators_PySCeS
