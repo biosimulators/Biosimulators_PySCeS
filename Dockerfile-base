@@ -64,7 +64,7 @@ RUN apt-get update -y \
         git \
         gcc \
         gfortran \
-        libgfortran-7-dev \
+        libgfortran5 \
     \
     && pip install git+https://github.com/PySCeS/pysces.git@${PYSCES_REVISION} \
     \

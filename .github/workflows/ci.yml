@@ -134,7 +134,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             git \
             gcc \
-            gfortran
+            gfortran \
+            libgfortran5
           
           python -m pip install git+https://github.com/PySCeS/pysces.git@${PYSCES_REVISION}
 
