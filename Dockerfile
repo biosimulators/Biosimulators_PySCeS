@@ -32,9 +32,12 @@ LABEL \
 # Copy code for command-line interface into image and install it
 COPY . /root/Biosimulators_PySCeS
 RUN pip install /root/Biosimulators_PySCeS \
+    && mkdir -p /Pysces \
+    && mkdir -p /Pysces/psc \
     && mkdir -p /root/Pysces \
     && mkdir -p /root/Pysces/psc \
-    && mv /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /root/Pysces/.pys_usercfg.ini \
+    && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /Pysces/.pys_usercfg.ini \
+    && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /root/Pysces/.pys_usercfg.ini \
     && rm -rf /root/Biosimulators_PySCeS
 
 # supported environment variables
