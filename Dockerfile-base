@@ -58,7 +58,7 @@ RUN apt-get update -y \
 RUN pip install ipyparallel
 
 # install PySCeS
-ARG PYSCES_REVISION=470cd0b8afa4c14721a2b2bc00d4c71d80603801
+ARG PYSCES_REVISION=7478a05bc4480e580fabfe89acb259274ced7f6c
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         git \
