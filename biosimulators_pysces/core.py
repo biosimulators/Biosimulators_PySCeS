@@ -25,6 +25,7 @@ from kisao.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION
 from kisao.utils import get_preferred_substitute_algorithm_by_ids
 from kisao.warnings import AlgorithmSubstitutedWarning
 import functools
+import numpy
 import os
 import pysces
 import tempfile
@@ -230,10 +231,12 @@ def exec_sed_task(task, variables, log=None):
         else:
             sbml_id = target_x_paths_to_sbml_ids[variable.target]
             i_result = labels.get(sbml_id, None)
-            if i_result is None:
-                unpredicted_targets.append(variable.target)
-            else:
+            if i_result is not None:
                 variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
+            elif sbml_id in model.fixed_species:
+                variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, sbml_id))
+            else:
+                unpredicted_targets.append(variable.target)
 
     if unpredicted_symbols:
         raise NotImplementedError("".join([

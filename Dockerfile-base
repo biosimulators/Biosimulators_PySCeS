@@ -54,6 +54,9 @@ RUN apt-get update -y \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists
 
+# install Python requirements for PySCeS
+RUN pip install ipyparallel
+
 # install PySCeS
 ARG PYSCES_REVISION=470cd0b8afa4c14721a2b2bc00d4c71d80603801
 RUN apt-get update -y \
@@ -61,6 +64,7 @@ RUN apt-get update -y \
         git \
         gcc \
         gfortran \
+        libgfortran-7-dev \
     \
     && pip install git+https://github.com/PySCeS/pysces.git@${PYSCES_REVISION} \
     \
