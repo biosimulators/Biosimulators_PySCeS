@@ -107,7 +107,7 @@ jobs:
           cd build
           cmake ..
           make
-          make install
+          sudo make install
 
       - name: Install Assimulo Python requirements
         run: python -m pip install cython numpy scipy matplotlib
