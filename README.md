@@ -61,7 +61,7 @@ docker run \
 ```
 
 ## Documentation
-Documentation is available at https://biosimulators.github.io/Biosimulators_PySCeS/.
+Documentation is available at https://docs.biosimulators.org/Biosimulators_PySCeS/.
 
 ## License
 This package is released under the [MIT license](LICENSE).

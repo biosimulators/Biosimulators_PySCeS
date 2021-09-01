@@ -1,7 +1,7 @@
 # Base OS
 FROM ghcr.io/biosimulators/biosimulators_pysces/pysces_base:latest
 
-ARG VERSION=0.1.19
+ARG VERSION=0.1.20
 ARG SIMULATOR_VERSION="0.9.9"
 
 # metadata
