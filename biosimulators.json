@@ -21,7 +21,8 @@
   },
   "pythonApi": {
     "package": "biosimulators-pysces",
-    "module": "biosimulators_pysces"
+    "module": "biosimulators_pysces",
+    "installationInstructions": "https://docs.biosimulators.org/Biosimulators_PySCeS/installation.html"
   },
   "authors": [
     {
