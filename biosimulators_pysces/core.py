@@ -58,7 +58,7 @@ def exec_sedml_docs_in_combine_archive(archive_filename, out_dir, config=None):
 
 
 def exec_sed_doc(doc, working_dir, base_out_path, rel_out_path=None,
-                 apply_xml_model_changes=False,
+                 apply_xml_model_changes=True,
                  log=None, indent=0, pretty_print_modified_xml_models=False,
                  log_level=StandardOutputErrorCapturerLevel.c, config=None):
     """ Execute the tasks specified in a SED document and generate the specified outputs
@@ -323,9 +323,6 @@ def preprocess_sed_task(task, variables, config=None):
     Args:
         task (:obj:`Task`): task
         variables (:obj:`list` of :obj:`Variable`): variables that should be recorded
-        preprocessed_task (:obj:`PreprocessedTask`, optional): preprocessed information about the task, including possible
-            model changes and variables. This can be used to avoid repeatedly executing the same initialization for repeated
-            calls to this method.
         config (:obj:`Config`, optional): BioSimulators common configuration
 
     Returns:
