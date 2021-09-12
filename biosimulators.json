@@ -299,8 +299,16 @@
           "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species"
         },
         {
+          "variables": "constant parameter values",
+          "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@constant!='false']"
+        },
+        {
           "variables": "reaction fluxes",
           "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction"
+        },
+        {
+          "variables": "constant compartment sizes",
+          "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@constant!='false']"
         }
       ],
       "availableSoftwareInterfaceTypes": [
@@ -465,8 +473,16 @@
           "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species"
         },
         {
+          "variables": "constant parameter values",
+          "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@constant!='false']"
+        },
+        {
           "variables": "reaction fluxes",
           "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction"
+        },
+        {
+          "variables": "constant compartment sizes",
+          "targetPattern": "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@constant!='false']"
         }
       ],
       "availableSoftwareInterfaceTypes": [
@@ -476,6 +492,13 @@
         "BioSimulators Docker image"
       ],
       "dependencies": [
+        {
+          "name": "Assimulo",
+          "version": null,
+          "required": true,
+          "freeNonCommercialLicense": true,
+          "url": "https://jmodelica.org/assimulo/"
+        },
         {
           "name": "SUNDIALS",
           "version": null,

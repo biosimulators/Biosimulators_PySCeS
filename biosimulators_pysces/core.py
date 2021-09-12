@@ -12,7 +12,7 @@ from biosimulators_utils.config import get_config, Config  # noqa: F401
 from biosimulators_utils.log.data_model import CombineArchiveLog, TaskLog, StandardOutputErrorCapturerLevel  # noqa: F401
 from biosimulators_utils.viz.data_model import VizFormat  # noqa: F401
 from biosimulators_utils.report.data_model import ReportFormat, VariableResults, SedDocumentResults  # noqa: F401
-from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, UniformTimeCourseSimulation,  # noqa: F401
+from biosimulators_utils.sedml.data_model import (Task, ModelLanguage, ModelAttributeChange, UniformTimeCourseSimulation,  # noqa: F401
                                                   Variable, Symbol)
 from biosimulators_utils.utils.core import validate_str_value, parse_value
 from biosimulators_utils.sedml import validation
@@ -126,43 +126,115 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
     if preprocessed_task is None:
         preprocessed_task = preprocess_sed_task(task, variables, config=config)
 
-    model = task.model
-    sim = task.simulation
+    # get the model configured with simulation algorithm and its parameters
+    model = preprocessed_task['model']['model']
 
+    # modify model
+    raise_errors_warnings(validation.validate_model_change_types(task.model.changes, (ModelAttributeChange, )),
+                          error_summary='Changes for model `{}` are not supported.'.format(task.model.id))
+    model_change_target_sbml_id_map = preprocessed_task['model']['change_target_sbml_id_map']
+    for change in task.model.changes:
+        sbml_id = model_change_target_sbml_id_map[change.target]
+        new_value = float(change.new_value)
+        setattr(model, sbml_id + '_init', new_value)
+
+    # setup time course
+    sim = task.simulation
+    model.sim_start = sim.initial_time
+    model.sim_end = sim.output_end_time
+    model.sim_points = (
+        sim.number_of_points
+        * (sim.output_end_time - sim.initial_time)
+        / (sim.output_end_time - sim.output_start_time)
+        + 1
+    )
+    if model.sim_points != int(model.sim_points):
+        raise NotImplementedError('Time course must specify an integer number of time points')
+
+    # execute simulation
+    model.Simulate()
+
+    # extract results
+    results = model.data_sim.getAllSimData(lbls=False)
+    variable_results = VariableResults()
+    variable_results_model_attr_map = preprocessed_task['model']['variable_results_model_attr_map']
+    for variable in variables:
+        i_results, model_attr_name = variable_results_model_attr_map[(variable.target, variable.symbol)]
+        if i_results is not None:
+            variable_results[variable.id] = results[:, i_results][-(sim.number_of_points + 1):]
+        else:
+            variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
+
+    # log action
+    if config.LOG:
+        log.algorithm = preprocessed_task['simulation']['algorithm_kisao_id']
+
+        arguments = {}
+        for key, val in model.__settings__.items():
+            if model.mode_integrator == 'CVODE':
+                if key.startswith('cvode_'):
+                    arguments[key] = val
+            else:
+                if key.startswith('lsoda_'):
+                    arguments[key] = val
+
+        log.simulator_details = {
+            'method': model.Simulate.__module__ + '.' + model.Simulate.__name__,
+            'arguments': arguments,
+        }
+
+    # return results and log
+    return variable_results, log
+
+
+def preprocess_sed_task(task, variables, config=None):
+    """ Preprocess a SED task, including its possible model changes and variables. This is useful for avoiding
+    repeatedly initializing tasks on repeated calls of :obj:`exec_sed_task`.
+
+    Args:
+        task (:obj:`Task`): task
+        variables (:obj:`list` of :obj:`Variable`): variables that should be recorded
+        config (:obj:`Config`, optional): BioSimulators common configuration
+
+    Returns:
+        :obj:`object`: preprocessed information about the task
+    """
+    config = config or get_config()
+
+    # validate simulation
     if config.VALIDATE_SEDML:
         raise_errors_warnings(validation.validate_task(task),
                               error_summary='Task `{}` is invalid.'.format(task.id))
         raise_errors_warnings(validation.validate_model_language(task.model.language, ModelLanguage.SBML),
-                              error_summary='Language for model `{}` is not supported.'.format(model.id))
-        raise_errors_warnings(validation.validate_model_change_types(task.model.changes, ()),
-                              error_summary='Changes for model `{}` are not supported.'.format(model.id))
+                              error_summary='Language for model `{}` is not supported.'.format(task.model.id))
+        raise_errors_warnings(validation.validate_model_change_types(task.model.changes, (ModelAttributeChange, )),
+                              error_summary='Changes for model `{}` are not supported.'.format(task.model.id))
         raise_errors_warnings(*validation.validate_model_changes(task.model),
-                              error_summary='Changes for model `{}` are invalid.'.format(model.id))
+                              error_summary='Changes for model `{}` are invalid.'.format(task.model.id))
         raise_errors_warnings(validation.validate_simulation_type(task.simulation, (UniformTimeCourseSimulation, )),
-                              error_summary='{} `{}` is not supported.'.format(sim.__class__.__name__, sim.id))
+                              error_summary='{} `{}` is not supported.'.format(task.simulation.__class__.__name__, task.simulation.id))
         raise_errors_warnings(*validation.validate_simulation(task.simulation),
-                              error_summary='Simulation `{}` is invalid.'.format(sim.id))
+                              error_summary='Simulation `{}` is invalid.'.format(task.simulation.id))
         raise_errors_warnings(*validation.validate_data_generator_variables(variables),
                               error_summary='Data generator variables for task `{}` are invalid.'.format(task.id))
 
     model_etree = lxml.etree.parse(task.model.source)
-    target_x_paths_to_sbml_ids = validation.validate_target_xpaths(variables, model_etree, attr='id')
-
-    # Get the current working directory because PySCeS opaquely changes it
-    cwd = os.getcwd()
+    change_target_sbml_id_map = validation.validate_target_xpaths(task.model.changes, model_etree, attr='id')
+    variable_target_sbml_id_map = validation.validate_target_xpaths(variables, model_etree, attr='id')
 
     # Read the model
-    interfaces = pysces.PyscesInterfaces.Core2interfaces()
-    fid, model_filename = tempfile.mkstemp(suffix='.psc')
-    os.close(fid)
+    sbml_model_filename = task.model.source
+    pysces_interface = pysces.PyscesInterfaces.Core2interfaces()
+    pysces_model_file, pysces_model_filename = tempfile.mkstemp(suffix='.psc')
+    os.close(pysces_model_file)
     try:
-        interfaces.convertSBML2PSC(sbmlfile=task.model.source, pscfile=model_filename)
+        pysces_interface.convertSBML2PSC(sbmlfile=sbml_model_filename, pscfile=pysces_model_filename)
     except Exception as exception:
-        os.remove(model_filename)
+        os.remove(pysces_model_filename)
         raise ValueError('Model at {} could not be imported:\n  {}'.format(
             task.model.source, str(exception).replace('\n', '\n  ')))
-    model = pysces.model(model_filename)
-    os.remove(model_filename)
+    model = pysces.model(pysces_model_filename)
+    os.remove(pysces_model_filename)
 
     # Load the algorithm specified by `simulation.algorithm.kisao_id`
     sim = task.simulation
@@ -233,99 +305,59 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
     if model.mode_integrator == 'CVODE':
         model.__settings__['cvode_return_event_timepoints'] = False
 
-    # setup time course
-    model.sim_start = sim.initial_time
-    model.sim_end = sim.output_end_time
-    model.sim_points = (
-        sim.number_of_points
-        * (sim.output_end_time - sim.initial_time)
-        / (sim.output_end_time - sim.output_start_time)
-        + 1
-    )
-    if model.sim_points != int(model.sim_points):
-        raise NotImplementedError('Time course must specify an integer number of time points')
+    # validate and preprocess variables
+    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions)
+    fixed_ids = (set(model.parameters) | set(model.__compartments__.keys())).difference(set(model.__rules__.keys()))
 
-    # execute simulation
-    model.Simulate()
+    variable_results_model_attr_map = {}
 
-    # extract results
-    variable_results = VariableResults()
     unpredicted_symbols = []
     unpredicted_targets = []
-    results, labels = model.data_sim.getAllSimData(lbls=True)
-    labels = {label: i_label for i_label, label in enumerate(labels)}
 
     for variable in variables:
         if variable.symbol:
-            if variable.symbol == Symbol.time:
-                i_result = labels['Time']
-                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
+            if variable.symbol == Symbol.time.value:
+                variable_results_model_attr_map[(variable.target, variable.symbol)] = (0, None)
             else:
                 unpredicted_symbols.append(variable.symbol)
 
         else:
-            sbml_id = target_x_paths_to_sbml_ids[variable.target]
-            i_result = labels.get(sbml_id, None)
-            if i_result is not None:
-                variable_results[variable.id] = results[:, i_result][-(sim.number_of_points + 1):]
-            elif sbml_id in model.fixed_species:
-                variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, sbml_id))
-            else:
-                unpredicted_targets.append(variable.target)
+            sbml_id = variable_target_sbml_id_map[variable.target]
+            try:
+                i_dynamic = dynamic_ids.index(sbml_id)
+                variable_results_model_attr_map[(variable.target, variable.symbol)] = (i_dynamic, None)
+            except ValueError:
+                if sbml_id in fixed_ids:
+                    variable_results_model_attr_map[(variable.target, variable.symbol)] = (None, sbml_id)
+                else:
+                    unpredicted_targets.append(variable.target)
 
     if unpredicted_symbols:
         raise NotImplementedError("".join([
             "The following variable symbols are not supported:\n  - {}\n\n".format(
                 '\n  - '.join(sorted(unpredicted_symbols)),
             ),
-            "Symbols must be one of the following:\n  - {}".format(Symbol.time),
+            "Symbols must be one of the following:\n  - {}".format(Symbol.time.value),
         ]))
 
     if unpredicted_targets:
         raise ValueError(''.join([
-            'The following variable targets could not be recorded:\n  - {}\n\n'.format(
+            'The following variable targets cannot not be recorded:\n  - {}\n\n'.format(
                 '\n  - '.join(sorted(unpredicted_targets)),
             ),
-            'Targets must have one of the following ids:\n  - {}'.format(
-                '\n  - '.join(sorted(set(labels.keys()).difference(set(['Time'])))),
+            'Targets must have one of the following SBML ids:\n  - {}'.format(
+                '\n  - '.join(sorted(dynamic_ids + list(fixed_ids))),
             ),
         ]))
 
-    # restore working directory
-    os.chdir(cwd)
-
-    # log action
-    if config.LOG:
-        log.algorithm = 'KISAO_0000019' if model.mode_integrator == 'CVODE' else 'KISAO_0000088'
-
-        arguments = {}
-        for key, val in model.__settings__.items():
-            if model.mode_integrator == 'CVODE':
-                if key.startswith('cvode_'):
-                    arguments[key] = val
-            else:
-                if key.startswith('lsoda_'):
-                    arguments[key] = val
-
-        log.simulator_details = {
-            'method': model.Simulate.__module__ + '.' + model.Simulate.__name__,
-            'arguments': arguments,
-        }
-
-    # return results and log
-    return variable_results, log
-
-
-def preprocess_sed_task(task, variables, config=None):
-    """ Preprocess a SED task, including its possible model changes and variables. This is useful for avoiding
-    repeatedly initializing tasks on repeated calls of :obj:`exec_sed_task`.
-
-    Args:
-        task (:obj:`Task`): task
-        variables (:obj:`list` of :obj:`Variable`): variables that should be recorded
-        config (:obj:`Config`, optional): BioSimulators common configuration
-
-    Returns:
-        :obj:`object`: preprocessed information about the task
-    """
-    pass
+    # return preprocessed information
+    return {
+        'model': {
+            'model': model,
+            'change_target_sbml_id_map': change_target_sbml_id_map,
+            'variable_results_model_attr_map': variable_results_model_attr_map,
+        },
+        'simulation': {
+            'algorithm_kisao_id': 'KISAO_0000019' if model.mode_integrator == 'CVODE' else 'KISAO_0000088',
+        },
+    }

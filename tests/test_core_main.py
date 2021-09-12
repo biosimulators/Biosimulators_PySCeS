@@ -24,6 +24,7 @@ from biosimulators_utils.warnings import BioSimulatorsWarning
 from kisao.exceptions import AlgorithmCannotBeSubstitutedException
 from kisao.warnings import AlgorithmSubstitutedWarning
 from unittest import mock
+import copy
 import datetime
 import dateutil.tz
 import numpy
@@ -95,13 +96,113 @@ class CliTestCase(unittest.TestCase):
 
         self.assertTrue(sorted(variable_results.keys()), sorted([var.id for var in variables]))
         self.assertEqual(variable_results[variables[0].id].shape, (task.simulation.number_of_points + 1,))
-        numpy.testing.assert_almost_equal(
+        numpy.testing.assert_allclose(
             variable_results['time'],
             numpy.linspace(task.simulation.output_start_time, task.simulation.output_end_time, task.simulation.number_of_points + 1),
         )
 
         for results in variable_results.values():
             self.assertFalse(numpy.any(numpy.isnan(results)))
+
+    def test_exec_sed_task_negative_initial_time(self):
+        task = sedml_data_model.Task(
+            model=sedml_data_model.Model(
+                source=os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000002.xml'),
+                language=sedml_data_model.ModelLanguage.SBML.value,
+            ),
+            simulation=sedml_data_model.UniformTimeCourseSimulation(
+                algorithm=sedml_data_model.Algorithm(
+                    kisao_id='KISAO_0000088',
+                ),
+                initial_time=-5.,
+                output_start_time=0.,
+                output_end_time=10.,
+                number_of_points=20,
+            ),
+        )
+
+        variables = [
+            sedml_data_model.Variable(id='time', symbol=sedml_data_model.Symbol.time, task=task),
+            sedml_data_model.Variable(
+                id='AL',
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']",
+                target_namespaces=self.NAMESPACES,
+                task=task,
+            ),
+        ]
+
+        variable_results, _ = core.exec_sed_task(task, variables)
+
+        numpy.testing.assert_allclose(
+            variable_results['time'],
+            numpy.linspace(task.simulation.output_start_time, task.simulation.output_end_time, task.simulation.number_of_points + 1),
+        )
+
+    def test_exec_sed_task_with_changes(self):
+        task = sedml_data_model.Task(
+            model=sedml_data_model.Model(
+                source=os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000002.xml'),
+                language=sedml_data_model.ModelLanguage.SBML.value,
+            ),
+            simulation=sedml_data_model.UniformTimeCourseSimulation(
+                algorithm=sedml_data_model.Algorithm(
+                    kisao_id='KISAO_0000088',
+                ),
+                initial_time=0.,
+                output_start_time=0.,
+                output_end_time=10.,
+                number_of_points=10,
+            ),
+        )
+
+        species = ['BLL', 'IL', 'AL', 'A', 'BL', 'B', 'DLL', 'D', 'ILL', 'DL', 'I', 'ALL', 'L']
+
+        variables = [
+            sedml_data_model.Variable(id='time', symbol=sedml_data_model.Symbol.time, task=task),
+        ]
+        for specie in species:
+            task.model.changes.append(sedml_data_model.ModelAttributeChange(
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(specie),
+                target_namespaces=self.NAMESPACES,
+                new_value=None
+            ))
+            variables.append(sedml_data_model.Variable(
+                id=specie,
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(specie),
+                target_namespaces=self.NAMESPACES,
+                task=task,
+            ))
+
+        preprocessed_task = core.preprocess_sed_task(task, variables)
+
+        task.model.changes = []
+        results, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+
+        task.simulation.output_end_time /= 2
+        task.simulation.number_of_points = int(task.simulation.number_of_points / 2)
+        results2, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        for specie in species:
+            numpy.testing.assert_allclose(results2[specie], results[specie][0:task.simulation.number_of_points + 1])
+
+        for specie in species:
+            task.model.changes.append(sedml_data_model.ModelAttributeChange(
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(specie),
+                target_namespaces=self.NAMESPACES,
+                new_value=results2[specie][-1],
+            ))
+        results3, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        for specie in species:
+            numpy.testing.assert_allclose(results3[specie], results[specie][task.simulation.number_of_points:], rtol=1e-4)
+
+        for specie in species:
+            task.model.changes.append(sedml_data_model.ModelAttributeChange(
+                target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(specie),
+                target_namespaces=self.NAMESPACES,
+                new_value=str(results2[specie][-1]),
+            ))
+        results3, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        for specie in species:
+            numpy.testing.assert_allclose(results3[specie], results[specie][task.simulation.number_of_points:], rtol=1e-4)
 
     def test_exec_sed_task_error_handling(self):
         with mock.patch.dict('os.environ', {'ALGORITHM_SUBSTITUTION_POLICY': 'NONE'}):
@@ -185,9 +286,12 @@ class CliTestCase(unittest.TestCase):
                 core.exec_sed_task(task, variables)
             variables[0].symbol = sedml_data_model.Symbol.time
 
-            variables[1].target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='kf_0']"
-            with self.assertRaisesRegex(ValueError, 'targets could not be recorded'):
-                core.exec_sed_task(task, variables)
+            task2 = copy.deepcopy(task)
+            task2.model.source = os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000678.xml')
+            variables2 = copy.deepcopy(variables[1:2])
+            variables2[0].target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dNFAT']"
+            with self.assertRaisesRegex(ValueError, 'targets cannot not be recorded'):
+                core.exec_sed_task(task2, variables2)
             variables[1].target = "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']"
 
         # algorithm substition
@@ -384,7 +488,7 @@ class CliTestCase(unittest.TestCase):
 
         sim = doc.tasks[0].simulation
         self.assertEqual(len(report_results[report.data_sets[0].id]), sim.number_of_points + 1)
-        numpy.testing.assert_almost_equal(
+        numpy.testing.assert_allclose(
             report_results[report.data_sets[0].id],
             numpy.linspace(sim.output_start_time, sim.output_end_time, sim.number_of_points + 1),
         )
@@ -399,7 +503,7 @@ class CliTestCase(unittest.TestCase):
 
         sim = doc.tasks[0].simulation
         self.assertEqual(len(report_results[report.data_sets[0].id]), sim.number_of_points + 1)
-        numpy.testing.assert_almost_equal(
+        numpy.testing.assert_allclose(
             report_results[report.data_sets[0].id],
             numpy.linspace(sim.output_start_time, sim.output_end_time, sim.number_of_points + 1),
         )
@@ -520,7 +624,7 @@ class CliTestCase(unittest.TestCase):
         self.assertEqual(set(report_results.keys()), set(['data_set_time', 'data_set_FeDuo']))
 
         self.assertEqual(len(report_results['data_set_time']), 300 + 1)
-        numpy.testing.assert_almost_equal(
+        numpy.testing.assert_allclose(
             report_results['data_set_time'],
             numpy.linspace(0., 5100., 300 + 1),
         )
