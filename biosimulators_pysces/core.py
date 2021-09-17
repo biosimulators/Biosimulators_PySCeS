@@ -106,7 +106,7 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
     Args:
         task (:obj:`Task`): task
         variables (:obj:`list` of :obj:`Variable`): variables that should be recorded
-        preprocessed_task (:obj:`object`, optional): preprocessed information about the task, including possible
+        preprocessed_task (:obj:`dict`, optional): preprocessed information about the task, including possible
             model changes and variables. This can be used to avoid repeatedly executing the same initialization
             for repeated calls to this method.
         log (:obj:`TaskLog`, optional): log for the task
@@ -197,7 +197,7 @@ def preprocess_sed_task(task, variables, config=None):
         config (:obj:`Config`, optional): BioSimulators common configuration
 
     Returns:
-        :obj:`object`: preprocessed information about the task
+        :obj:`dict`: preprocessed information about the task
     """
     config = config or get_config()
 
