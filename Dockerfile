@@ -2,7 +2,7 @@
 FROM ghcr.io/biosimulators/biosimulators_pysces/pysces_base:latest
 
 ARG VERSION=0.1.21
-ARG SIMULATOR_VERSION="0.9.9"
+ARG SIMULATOR_VERSION="1.0.0"
 
 # metadata
 LABEL \
