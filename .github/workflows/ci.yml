@@ -53,6 +53,16 @@ jobs:
       #############################################
       ## Update the version of the simulator
       #############################################
+      - name: Check that the version of the simulator is available from PyPI
+        if: github.event.inputs.simulatorVersion
+        uses: emilioschepis/wait-for-endpoint@v1.0.0
+        with:
+          url: https://pypi.org/pypi/pysces/${{ github.event.inputs.simulatorVersion }}/json
+          method: GET
+          expected-status: 200
+          timeout: 3600000 # 1 hr
+          interval: 60000 # 1 min
+
       - name: Update the version of the simulator
         if: github.event.inputs.simulatorVersion
         run: |
@@ -127,17 +137,26 @@ jobs:
           python -m pip install git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
 
       - name: Install PySCeS
-        env:
-          PYSCES_REVISION: 470cd0b8afa4c14721a2b2bc00d4c71d80603801
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            git \
-            gcc \
-            gfortran \
-            libgfortran5
-          
-          python -m pip install git+https://github.com/PySCeS/pysces.git@${PYSCES_REVISION}
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 20
+          retry_on: error
+          retry_wait_seconds: 300
+          max_attempts: 4
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y --no-install-recommends jq
+
+            SIMULATOR_VERSION=$(jq -r '.version' biosimulators.json)
+
+            sudo apt-get update -y
+            sudo apt-get install -y --no-install-recommends \
+              git \
+              gcc \
+              gfortran \
+              libgfortran5
+                      
+            python -m pip install "pysces==${SIMULATOR_VERSION}"
 
       # install package
       - name: Install the package

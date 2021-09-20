@@ -5,6 +5,7 @@ __pycache__/
 dist/
 build/
 _pystmptmp*_parsetab.py
+*-sbml_conversion_errors.txt
 
 # coverage files
 htmlcov/

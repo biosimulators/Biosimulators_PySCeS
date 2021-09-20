@@ -1,7 +1,7 @@
 # Base OS
 FROM ghcr.io/biosimulators/biosimulators_pysces/pysces_base:latest
 
-ARG VERSION=0.1.21
+ARG VERSION=0.1.22
 ARG SIMULATOR_VERSION="1.0.0"
 
 # metadata
@@ -29,6 +29,23 @@ LABEL \
     extra.identifiers.biotools="pysces" \
     maintainer="BioSimulators Team <info@biosimulators.org>"
 
+# install PySCeS
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        git \
+        gcc \
+        gfortran \
+        libgfortran5 \
+    \
+    && pip install "pysces[all]==${SIMULATOR_VERSION}" \
+    \
+    && apt-get remove -y \
+        git \
+        gcc \
+        gfortran \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists
+
 # Copy code for command-line interface into image and install it
 COPY . /root/Biosimulators_PySCeS
 RUN pip install /root/Biosimulators_PySCeS \
@@ -40,7 +57,6 @@ RUN pip install /root/Biosimulators_PySCeS \
     && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /Pysces/.pys_usercfg.ini \
     && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /root/Pysces/.pys_usercfg.ini \
     && rm -rf /root/Biosimulators_PySCeS
-RUN pip install "pysces==${SIMULATOR_VERSION}"
 
 # supported environment variables
 ENV ALGORITHM_SUBSTITUTION_POLICY=SIMILAR_VARIABLES \
