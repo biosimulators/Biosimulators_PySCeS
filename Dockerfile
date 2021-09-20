@@ -40,6 +40,7 @@ RUN pip install /root/Biosimulators_PySCeS \
     && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /Pysces/.pys_usercfg.ini \
     && cp /root/Biosimulators_PySCeS/.pys_usercfg.Dockerfile.ini /root/Pysces/.pys_usercfg.ini \
     && rm -rf /root/Biosimulators_PySCeS
+RUN pip install "pysces==${SIMULATOR_VERSION}"
 
 # supported environment variables
 ENV ALGORITHM_SUBSTITUTION_POLICY=SIMILAR_VARIABLES \
