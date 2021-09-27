@@ -19,6 +19,12 @@
     },
     "operatingSystemType": "Linux"
   },
+  "cli": {
+    "packageRepository": "PyPI",
+    "package": "biosimulators-pysces",
+    "command": "biosimulators-pysces",
+    "installationInstructions": "https://docs.biosimulators.org/Biosimulators_PySCeS/installation.html"
+  },
   "pythonApi": {
     "package": "biosimulators-pysces",
     "module": "biosimulators_pysces",
