@@ -13,12 +13,31 @@
       "contributions": [
         "code"
       ]
-    }  
+    },
+    {
+      "login": "bgoli",
+      "name": "Brett Olivier",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5011985?v=4",
+      "profile": "http://teusinkbruggemanlab.nl/brett-olivier/",
+      "contributions": [
+        "tool"
+      ]
+    },
+    {
+      "login": "jmrohwer",
+      "name": "Johann Rohwer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/502289?v=4",
+      "profile": "https://github.com/jmrohwer",
+      "contributions": [
+        "tool"
+      ]
+    }
   ],
   "contributorsPerLine": 7,
   "projectName": "Biosimulators_PySCeS",
   "projectOwner": "biosimulators",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "none"
 }
