@@ -110,7 +110,8 @@ jobs:
               g++
           
           cd /tmp
-          wget https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz
+          # ignore certificate checking because certificate was expired as of 2021-11-10
+          wget --no-check-certificate https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz
           tar xvvf sundials-${SUNDIALS_VERSION}.tar.gz
           cd sundials-${SUNDIALS_VERSION}
           mkdir build

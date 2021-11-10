@@ -1,6 +1,7 @@
 FROM python:3.9-slim-buster
 
 # install SUNDIALS
+# Skip certificate check because the LLNL certificate is expired (as of 2021-11-03)
 ARG SUNDIALS_VERSION=2.6.2
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
@@ -10,7 +11,7 @@ RUN apt-get update -y \
         g++ \
     \
     && cd /tmp \
-    && wget https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz \
+    && wget --no-check-certificate https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz \
     && tar xvvf sundials-${SUNDIALS_VERSION}.tar.gz \
     && cd sundials-${SUNDIALS_VERSION} \
     && mkdir build \
