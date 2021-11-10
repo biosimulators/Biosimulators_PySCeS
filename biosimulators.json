@@ -85,8 +85,8 @@
         "title": "Modelling cellular systems with PySCeS",
         "authors": "Brett G. Olivier, Johann M. Rohwer & Jan-Hendrik S. Hofmeyr",
         "journal": "Bioinformatics",
-        "volume": 21,
-        "issue": 4,
+        "volume": "21",
+        "issue": "4",
         "pages": "560-561",
         "year": 2005,
         "identifiers": [
@@ -480,8 +480,8 @@
           "title": "CVODE, a stiff/nonstiff ODE solver in C",
           "authors": "Scott D. Cohen, Alan C. Hindmarsh & Paul F. Dubois",
           "journal": "Computers in Physics",
-          "volume": 10,
-          "issue": 2,
+          "volume": "10",
+          "issue": "2",
           "pages": "138-143",
           "year": 1996,
           "identifiers": [

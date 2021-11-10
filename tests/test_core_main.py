@@ -27,6 +27,7 @@ from unittest import mock
 import copy
 import datetime
 import dateutil.tz
+import json
 import numpy
 import numpy.testing
 import os
@@ -351,6 +352,8 @@ class CliTestCase(unittest.TestCase):
         _, log = core.exec_sedml_docs_in_combine_archive(archive_filename, out_dir, config=config)
         if log.exception:
             raise log.exception
+
+        json.dumps(log.to_json())
 
         self._assert_combine_archive_outputs(doc, out_dir)
 
