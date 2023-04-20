@@ -14,7 +14,7 @@ on:
 jobs:
   continuousIntegration:
     name: Update simulator version, lint, test, compile documentation, and release
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     outputs:
       mainBranch: ${{ steps.get-main-branch.outputs.mainBranch }}
       mainBranchRef: ${{ steps.get-main-branch.outputs.mainBranchRef }}
