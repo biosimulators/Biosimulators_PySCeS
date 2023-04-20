@@ -131,7 +131,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
               g++ \
               gfortran \
-              libblas-c-dev \
+              libblas-dev \
               liblapack-dev \
               git
           
