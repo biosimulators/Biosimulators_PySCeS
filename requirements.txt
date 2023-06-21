@@ -1,5 +1,5 @@
-biosimulators_utils[sbml,logging] >= 0.1.128
-kisao
+biosimulators_utils[sbml,logging] >= 0.1.180
+kisao >= 2.32
 lxml
 numpy
 pysces[sbml,parscan] >= 1.0.0
