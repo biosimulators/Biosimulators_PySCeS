@@ -125,7 +125,7 @@ jobs:
 
       - name: Install Assimulo
         env:
-          ASSIMULO_VERSION: 3.2.5
+          ASSIMULO_VERSION: 3.4.1
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
