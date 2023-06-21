@@ -156,6 +156,11 @@ jobs:
       - name: Install PySCeS
         run: conda install -c pysces pysces
 
+      - name: Install other requirements
+        run: |
+          conda install -c conda-forge setuptools
+          python -m pip install -r requirements.txt
+
 #      - name: Install PySCeS
 #        uses: nick-invision/retry@v2
 #        with:
