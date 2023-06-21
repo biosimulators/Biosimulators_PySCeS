@@ -81,7 +81,7 @@ jobs:
       ## Install package and its dependencies
       #############################################
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.9'
 
@@ -124,18 +124,19 @@ jobs:
         run: python -m pip install cython numpy scipy matplotlib
 
       - name: Install Assimulo
-        env:
-          ASSIMULO_VERSION: 3.4.1
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-              g++ \
-              gfortran \
-              libblas-dev \
-              liblapack-dev \
-              git
+        run: python -m pip install assimulo
+#        env:
+#          ASSIMULO_VERSION: 3.4.1
+#        run: |
+#          sudo apt-get update -y
+#          sudo apt-get install -y --no-install-recommends \
+#              g++ \
+#              gfortran \
+#              libblas-dev \
+#              liblapack-dev \
+#              git
           
-          python -m pip install git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
+#          python -m pip install git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
 
       - name: Install PySCeS
         uses: nick-invision/retry@v2
