@@ -167,6 +167,7 @@ jobs:
       - name: Install Assimulo
         run: |
           conda install -c conda-forge assimulo
+          conda init
           python -c "import assimulo"
 
       - name: Install PySCeS
