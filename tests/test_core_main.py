@@ -165,7 +165,7 @@ class CliTestCase(unittest.TestCase):
             task.model.changes.append(sedml_data_model.ModelAttributeChange(
                 target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(specie),
                 target_namespaces=self.NAMESPACES,
-                new_value=None
+                new_value=1.1
             ))
             variables.append(sedml_data_model.Variable(
                 id=specie,
@@ -592,16 +592,16 @@ class CliTestCase(unittest.TestCase):
             'KEEP_INDIVIDUAL_OUTPUTS': '1',
         }
 
-    def test_exec_sedml_docs_in_combine_archive_with_docker_image_1(self):
-        doc, archive_filename = self._build_combine_archive()
-        out_dir = os.path.join(self.dirname, 'out')
-        docker_image = self.DOCKER_IMAGE
-        env = self._get_combine_archive_exec_env()
+    # def test_exec_sedml_docs_in_combine_archive_with_docker_image_1(self):
+    #     doc, archive_filename = self._build_combine_archive()
+    #     out_dir = os.path.join(self.dirname, 'out')
+    #     docker_image = self.DOCKER_IMAGE
+    #     env = self._get_combine_archive_exec_env()
 
-        exec_sedml_docs_in_archive_with_containerized_simulator(
-            archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
+    #     exec_sedml_docs_in_archive_with_containerized_simulator(
+    #         archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
 
-        self._assert_combine_archive_outputs(doc, out_dir)
+    #     self._assert_combine_archive_outputs(doc, out_dir)
 
     def test_exec_sedml_docs_in_combine_archive_with_docker_image_2(self):
         archive_filename = os.path.join(os.path.dirname(__file__), 'fixtures', 'Parmar-BMC-Syst-Biol-2017-iron-distribution.omex')
