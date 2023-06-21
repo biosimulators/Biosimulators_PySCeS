@@ -592,7 +592,7 @@ class CliTestCase(unittest.TestCase):
             'KEEP_INDIVIDUAL_OUTPUTS': '1',
         }
 
-    def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
+    def test_exec_sedml_docs_in_combine_archive_with_docker_image_1(self):
         doc, archive_filename = self._build_combine_archive()
         out_dir = os.path.join(self.dirname, 'out')
         docker_image = self.DOCKER_IMAGE
@@ -603,7 +603,7 @@ class CliTestCase(unittest.TestCase):
 
         self._assert_combine_archive_outputs(doc, out_dir)
 
-    def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
+    def test_exec_sedml_docs_in_combine_archive_with_docker_image_2(self):
         archive_filename = os.path.join(os.path.dirname(__file__), 'fixtures', 'Parmar-BMC-Syst-Biol-2017-iron-distribution.omex')
         out_dir = os.path.join(self.dirname, 'out')
         docker_image = self.DOCKER_IMAGE
@@ -634,3 +634,6 @@ class CliTestCase(unittest.TestCase):
 
         for data_set_result in report_results.values():
             self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
+
+if __name__ == "__main__":
+    unittest.main()
