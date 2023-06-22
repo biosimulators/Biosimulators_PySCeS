@@ -191,7 +191,7 @@ jobs:
           conda activate pysces
           conda install -c conda-forge setuptools
           conda install -c conda-forge lxml numpy
-          python -m pip install -r biosimulators_utils kisao
+          python -m pip install biosimulators_utils kisao
 
       - name: Install pytest and test dependencies
         run: |
