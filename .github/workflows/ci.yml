@@ -144,6 +144,7 @@ jobs:
           aut-update-conda: true
           python-version: 3.9
           channels: conda-forge
+          activate-environment: pysces
           retry_wait_seconds: 300
           max_attempts: 4
           command: |
@@ -155,6 +156,7 @@ jobs:
       #############################################
       - name: Install and run flake8
         run: |
+          conda activate pysces
           python -m pip install flake8
           python -m flake8
 #          conda install flake8
@@ -166,35 +168,48 @@ jobs:
 
       - name: Install Assimulo
         run: |
+          conda activate pysces
           conda install -c conda-forge assimulo
           conda init
 
       - name:  Check to see if Assimulo installed
         run: |
+          conda activate pysces
           python -c "import assimulo"
 
       - name: Install PySCeS
-        run: conda install -c pysces pysces
+        run: |
+          conda activate pysces
+          conda install -c pysces pysces
 
       - name: Install other requirements
         run: |
+          conda activate pysces
           conda install -c conda-forge setuptools
           python -m pip install -r requirements.txt
 
       - name: Install the package
-        run: python -m pip install .[all]
+        run: |
+          conda activate pysces
+          python -m pip install .[all]
 
       #############################################
       ## Test and upload coverage report to Codecov
       #############################################
       - name: Install pytest
-        run: conda install pytest pytest-cov
+        run: |
+          conda activate pysces
+          conda install pytest pytest-cov
 
       - name: Install the requirements for the tests
-        run: python -m pip install .[tests]
+        run: |
+          conda activate pysces
+          python -m pip install .[tests]
 
       - name: Run the tests
-        run: python -m pytest tests/ --cov=./biosimulators_pysces/ --cov-report=xml
+        run: |
+          conda activate pysces
+          python -m pytest tests/ --cov=./biosimulators_pysces/ --cov-report=xml
 
       - name: Upload the coverage report to Codecov
         uses: codecov/codecov-action@v2
