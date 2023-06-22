@@ -168,6 +168,9 @@ jobs:
         run: |
           conda install -c conda-forge assimulo
           conda init
+
+      - name:  Check to see if Assimulo installed
+        run: |
           python -c "import assimulo"
 
       - name: Install PySCeS
