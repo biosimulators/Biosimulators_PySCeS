@@ -190,9 +190,15 @@ jobs:
         run: |
           conda activate pysces
           conda install -c conda-forge setuptools
-          python -m pip install -r requirements.txt
+          conda install -c conda-forge lxml numpy
+          python -m pip install -r biosimulators_utils kisao
 
-      - name: Install the package
+      - name: Install pytest and test dependencies
+        run: |
+          conda activate pysces
+          conda install pytest pytest-cov python_dateutil
+
+      - name: Install this package
         run: |
           conda activate pysces
           python -m pip install .[all]
@@ -200,11 +206,6 @@ jobs:
       #############################################
       ## Test and upload coverage report to Codecov
       #############################################
-      - name: Install pytest
-        run: |
-          conda activate pysces
-          conda install pytest pytest-cov
-
       - name: Install the requirements for the tests
         run: |
           conda activate pysces
