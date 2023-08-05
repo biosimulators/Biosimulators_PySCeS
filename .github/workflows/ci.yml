@@ -95,7 +95,7 @@ jobs:
 
       - name: Install pip and setuptools
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip==23.0.0
           python -m pip install --upgrade setuptools
 
       - name: Install SUNDIALS and other requirements
