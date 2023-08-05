@@ -83,7 +83,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Setup caching for Python packages
         uses: actions/cache@v2
@@ -95,48 +95,38 @@ jobs:
 
       - name: Install pip and setuptools
         run: |
-          python -m pip install --upgrade pip==23.0.0
-          python -m pip install --upgrade pip==23.0.0
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
 
-      - name: Install SUNDIALS
-        env:
-          SUNDIALS_VERSION: 2.6.2
+      - name: Install SUNDIALS and other requirements
         run: |
           sudo apt-get update -y
+          sudo apt-get upgrade -y
           sudo apt-get install -y --no-install-recommends \
-              wget \
-              cmake \
-              make \
-              g++
+            wget \
+            make \
+            git \
+            g++ \
+            gfortran \
+            libblas-dev \
+            liblapack-dev \
+            libsundials-dev
           
-          cd /tmp
-          # ignore certificate checking because certificate was expired as of 2021-11-10
-          wget --no-check-certificate https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz
-          tar xvvf sundials-${SUNDIALS_VERSION}.tar.gz
-          cd sundials-${SUNDIALS_VERSION}
-          mkdir build
-          cd build
-          cmake ..
-          make
-          sudo make install
-
       - name: Install Assimulo Python requirements
         run: python -m pip install cython numpy scipy matplotlib
 
       - name: Install Assimulo
-        run: python -m pip install assimulo
-#        env:
-#          ASSIMULO_VERSION: 3.4.1
-#        run: |
-#          sudo apt-get update -y
-#          sudo apt-get install -y --no-install-recommends \
-#              g++ \
-#              gfortran \
-#              libblas-dev \
-#              liblapack-dev \
-#              git
-          
-#          python -m pip install git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
+        env:
+          ASSIMULO_VERSION: 3.4.3
+        run: |
+          python -m pip install --install-option="--optimize=1" \
+            --install-option="--extra-fortran-link-flags=-shared" \
+            --install-option="--sundials-home=/usr" \ 
+            --install-option="--blas-home=/usr/lib/x86_64-linux-gnu" \ 
+            --install-option="--lapack-home=/usr" \ 
+            --install-option="--extra-fortran-compile-flags=-fallow-argument-mismatch"  \
+            --install-option="--extra-c-flags=-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" \
+            git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
 
       - name: Install PySCeS
         uses: nick-invision/retry@v2
