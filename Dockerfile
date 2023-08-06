@@ -16,7 +16,7 @@ LABEL \
     org.opencontainers.image.vendor="BioSimulators Team" \
     org.opencontainers.image.licenses="BSD-3-Clause" \
     \
-    base_image="python:3.11-slim-bookworm" \
+    base_image="python:3.10-slim-bookworm" \
     version="${VERSION}" \
     software="PySCeS" \
     software.version="${SIMULATOR_VERSION}" \
