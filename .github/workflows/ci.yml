@@ -101,7 +101,7 @@ jobs:
       - name: Install SUNDIALS and other requirements
         run: |
           sudo apt-get update -y
-          sudo apt-get upgrade -y
+#          sudo apt-get upgrade -y
           sudo apt-get install -y --no-install-recommends \
             wget \
             make \
@@ -119,14 +119,24 @@ jobs:
         env:
           ASSIMULO_VERSION: 3.4.3
         run: |
-          python -m pip install --install-option="--optimize=1" \
-            --install-option="--extra-fortran-link-flags=-shared" \
-            --install-option="--sundials-home=/usr" \ 
-            --install-option="--blas-home=/usr/lib/x86_64-linux-gnu" \ 
-            --install-option="--lapack-home=/usr" \ 
-            --install-option="--extra-fortran-compile-flags=-fallow-argument-mismatch"  \
-            --install-option="--extra-c-flags=-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" \
-            git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
+          cd /tmp
+          wget https://github.com/modelon-community/Assimulo/archive/refs/tags/Assimulo-${ASSIMULO_VERSION}.zip
+          cd Assimulo-Assimulo-${ASSIMULO_VERSION}
+          python setup.py install --optimize=1 \
+            --extra-fortran-link-flags="-shared" \
+            --sundials-home=/usr \ 
+            --blas-home=/usr/lib/x86_64-linux-gnu \ 
+            --lapack-home=/usr \ 
+            --extra-fortran-compile-flags="-fallow-argument-mismatch"  \
+            --extra-c-flags="-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" 
+#          python -m pip install --install-option="--optimize=1" \
+#            --install-option="--extra-fortran-link-flags=-shared" \
+#            --install-option="--sundials-home=/usr" \
+#            --install-option="--blas-home=/usr/lib/x86_64-linux-gnu" \
+#            --install-option="--lapack-home=/usr" \
+#            --install-option="--extra-fortran-compile-flags=-fallow-argument-mismatch"  \
+#            --install-option="--extra-c-flags=-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" \
+#            git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
 
       - name: Install PySCeS
         uses: nick-invision/retry@v2
