@@ -101,10 +101,10 @@ jobs:
       - name: Install SUNDIALS and other requirements
         run: |
           sudo apt-get update -y
-#          sudo apt-get upgrade -y
           sudo apt-get install -y --no-install-recommends \
             wget \
             make \
+            unzip \
             git \
             g++ \
             gfortran \
@@ -121,6 +121,7 @@ jobs:
         run: |
           cd /tmp
           wget https://github.com/modelon-community/Assimulo/archive/refs/tags/Assimulo-${ASSIMULO_VERSION}.zip
+          unzip Assimulo-${ASSIMULO_VERSION}.zip
           cd Assimulo-Assimulo-${ASSIMULO_VERSION}
           python setup.py install --optimize=1 \
             --extra-fortran-link-flags="-shared" \
@@ -128,7 +129,7 @@ jobs:
             --blas-home=/usr/lib/x86_64-linux-gnu \ 
             --lapack-home=/usr \ 
             --extra-fortran-compile-flags="-fallow-argument-mismatch"  \
-            --extra-c-flags="-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" 
+            --extra-c-flags="-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION"
 #          python -m pip install --install-option="--optimize=1" \
 #            --install-option="--extra-fortran-link-flags=-shared" \
 #            --install-option="--sundials-home=/usr" \
