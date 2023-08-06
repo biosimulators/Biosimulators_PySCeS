@@ -2,7 +2,7 @@
 FROM ghcr.io/biosimulators/biosimulators_pysces/pysces_base:latest
 
 ARG VERSION=0.1.25
-ARG SIMULATOR_VERSION="1.1.0"
+ARG SIMULATOR_VERSION="1.1.1"
 
 # metadata
 LABEL \
@@ -16,7 +16,7 @@ LABEL \
     org.opencontainers.image.vendor="BioSimulators Team" \
     org.opencontainers.image.licenses="BSD-3-Clause" \
     \
-    base_image="python:3.10-slim-bookworm" \
+    base_image="python:3.11-slim-bookworm" \
     version="${VERSION}" \
     software="PySCeS" \
     software.version="${SIMULATOR_VERSION}" \

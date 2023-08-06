@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bookworm
+FROM python:3.11-slim-bookworm
 
 # install Python requirements for assimulo
 RUN pip install "cython<1.0" numpy scipy matplotlib
@@ -13,6 +13,7 @@ RUN apt-get update -y \
         liblapack-dev \
         git \
     \
+    && pip -V \
     && pip install --install-option="--optimize=1" \
             --install-option="--extra-fortran-link-flags=-shared" \
             --install-option="--sundials-home=/usr" \
