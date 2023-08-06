@@ -1,57 +1,38 @@
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-bookworm
 
 # install SUNDIALS
-# Skip certificate check because the LLNL certificate is expired (as of 2021-11-03)
-ARG SUNDIALS_VERSION=2.6.2
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
-        wget \
-        cmake \
-        make \
-        g++ \
+        libsundials-dev \
     \
-    && cd /tmp \
-    && wget --no-check-certificate https://computing.llnl.gov/sites/default/files/inline-files/sundials-${SUNDIALS_VERSION}.tar.gz \
-    && tar xvvf sundials-${SUNDIALS_VERSION}.tar.gz \
-    && cd sundials-${SUNDIALS_VERSION} \
-    && mkdir build \
-    && cd build \
-    && cmake .. \
-    && make \
-    && make install \
-    \
-    && cd /tmp \
-    && rm sundials-${SUNDIALS_VERSION}.tar.gz \
-    && rm -r sundials-${SUNDIALS_VERSION} \
-    \
-    && apt-get remove -y \
-        wget \
-        cmake \
-        make \
-        g++ \
-    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists
 
 # install Python requirements for assimulo
-RUN pip install cython numpy scipy matplotlib
+RUN pip install "cython<1.0" numpy scipy matplotlib
 
-ARG ASSIMULO_VERSION=3.2.5
+ARG ASSIMULO_VERSION=3.4.3
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         g++ \
-        gfortran \
-        liblas-dev \
+        libblas-dev \
         liblapack-dev \
         git \
     \
-    && pip install git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION} \
+    && pip install --install-option="--optimize=1" \
+            --install-option="--extra-fortran-link-flags=-shared" \
+            --install-option="--sundials-home=/usr" \
+            --install-option="--blas-home=/usr/lib/x86_64-linux-gnu" \
+            --install-option="--lapack-home=/usr" \
+            --install-option="--extra-fortran-compile-flags=-fallow-argument-mismatch"  \
+            --install-option="--extra-c-flags=-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" \
+            git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}  \
     \
     && apt-get remove -y \
         g++ \
-        gfortran \
         liblas-dev \
         liblapack-dev \
         git \
+    \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists
 
