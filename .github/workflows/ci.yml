@@ -93,51 +93,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install pip and setuptools
-        run: |
-          python -m pip install --upgrade pip==23.0.0
-          python -m pip install --upgrade setuptools
-
-      - name: Install SUNDIALS and other requirements
+      - name: Install SUNDIALS
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            wget \
-            make \
-            unzip \
-            git \
-            g++ \
-            gfortran \
-            libblas-dev \
-            liblapack-dev \
-            libsundials-dev
-          
-      - name: Install Assimulo Python requirements
-        run: python -m pip install "cython<1.0" numpy scipy matplotlib
+          sudo apt-get install -y --no-install-recommends libsundials-dev
+
+      - name: Install Python requirements
+        run: |
+          pip install -U pip==23.0.0
+          pip install "cython<1.0"
+          pip install scipy matplotlib nose
 
       - name: Install Assimulo
         env:
           ASSIMULO_VERSION: 3.4.3
         run: |
-          cd /tmp
-          wget https://github.com/modelon-community/Assimulo/archive/refs/tags/Assimulo-${ASSIMULO_VERSION}.zip
-          unzip Assimulo-${ASSIMULO_VERSION}.zip
-          cd Assimulo-Assimulo-${ASSIMULO_VERSION}
-          python setup.py install --optimize=1 \
-            --extra-fortran-link-flags="-shared" \
-            --sundials-home=/usr \ 
-            --blas-home=/usr/lib/x86_64-linux-gnu \ 
-            --lapack-home=/usr \ 
-            --extra-fortran-compile-flags="-fallow-argument-mismatch"  \
-            --extra-c-flags="-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION"
-#          python -m pip install --install-option="--optimize=1" \
-#            --install-option="--extra-fortran-link-flags=-shared" \
-#            --install-option="--sundials-home=/usr" \
-#            --install-option="--blas-home=/usr/lib/x86_64-linux-gnu" \
-#            --install-option="--lapack-home=/usr" \
-#            --install-option="--extra-fortran-compile-flags=-fallow-argument-mismatch"  \
-#            --install-option="--extra-c-flags=-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" \
-#            git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
+          pip install --install-option="--optimize=1" \
+            --install-option="--extra-fortran-link-flags=-shared" \
+            --install-option="--sundials-home=/usr" \
+            --install-option="--blas-home=/usr/lib/x86_64-linux-gnu" \
+            --install-option="--lapack-home=/usr" \
+            --install-option="--extra-fortran-compile-flags=-fallow-argument-mismatch"  \
+            --install-option="--extra-c-flags=-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION" \
+            git+https://github.com/modelon-community/Assimulo.git@Assimulo-${ASSIMULO_VERSION}
 
       - name: Install PySCeS
         uses: nick-invision/retry@v2
@@ -152,14 +130,7 @@ jobs:
 
             SIMULATOR_VERSION=$(jq -r '.version' biosimulators.json)
 
-            sudo apt-get update -y
-            sudo apt-get install -y --no-install-recommends \
-              git \
-              gcc \
-              gfortran \
-              libgfortran5
-                      
-            python -m pip install "pysces==${SIMULATOR_VERSION}"
+            pip install "pysces==${SIMULATOR_VERSION}"
 
       # install package
       - name: Install the package
