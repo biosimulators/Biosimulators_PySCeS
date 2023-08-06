@@ -1,18 +1,13 @@
 FROM python:3.10-slim-bookworm
 
-# install SUNDIALS
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        libsundials-dev \
-    \
-    && rm -rf /var/lib/apt/lists
-
 # install Python requirements for assimulo
 RUN pip install "cython<1.0" numpy scipy matplotlib
 
+# install SUNDIALS and Assimulo
 ARG ASSIMULO_VERSION=3.4.3
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
+        libsundials-dev \
         g++ \
         libblas-dev \
         liblapack-dev \
@@ -29,11 +24,12 @@ RUN apt-get update -y \
     \
     && apt-get remove -y \
         g++ \
-        liblas-dev \
+        libblas-dev \
         liblapack-dev \
         git \
     \
     && apt-get autoremove -y \
+    && apt-get install -y libsundials-dev \
     && rm -rf /var/lib/apt/lists
 
 # fonts for matplotlib
