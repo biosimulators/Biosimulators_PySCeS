@@ -30,7 +30,15 @@ RUN apt-get update -y \
         git \
     \
     && apt-get autoremove -y \
-    && apt-get install -y libsundials-dev \
+    && apt-get install -y --no-install-recommends \
+        libsundials-arkode5 \
+        libsundials-cvode6 \
+        libsundials-cvodes6 \
+        libsundials-ida6 \
+        libsundials-idas5 \
+        libsundials-kinsol6 \
+        libsundials-nvecserial6  \
+    \
     && rm -rf /var/lib/apt/lists
 
 # fonts for matplotlib
