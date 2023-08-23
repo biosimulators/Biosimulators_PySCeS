@@ -306,7 +306,7 @@ def preprocess_sed_task(task, variables, config=None):
         model.__settings__['cvode_return_event_timepoints'] = False
 
     # validate and preprocess variables
-    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions) + list(model.parameters) + list(model.compartments)
+    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions) + list(model.parameters)
     fixed_ids = (set(model.parameters) | set(model.__compartments__.keys())).difference(set(model.__rules__.keys()))
 
     variable_results_model_attr_map = {}
