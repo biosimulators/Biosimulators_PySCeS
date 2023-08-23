@@ -306,7 +306,7 @@ def preprocess_sed_task(task, variables, config=None):
         model.__settings__['cvode_return_event_timepoints'] = False
 
     # validate and preprocess variables
-    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions)
+    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions) + list(model.parameters) + list(model.compartments)
     fixed_ids = (set(model.parameters) | set(model.__compartments__.keys())).difference(set(model.__rules__.keys()))
 
     variable_results_model_attr_map = {}
@@ -342,7 +342,7 @@ def preprocess_sed_task(task, variables, config=None):
 
     if unpredicted_targets:
         raise ValueError(''.join([
-            'The following variable targets cannot not be recorded:\n  - {}\n\n'.format(
+            'The following variable targets cannot be recorded:\n  - {}\n\n'.format(
                 '\n  - '.join(sorted(unpredicted_targets)),
             ),
             'Targets must have one of the following SBML ids:\n  - {}'.format(
