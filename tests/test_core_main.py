@@ -165,7 +165,7 @@ class CliTestCase(unittest.TestCase):
             task.model.changes.append(sedml_data_model.ModelAttributeChange(
                 target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(specie),
                 target_namespaces=self.NAMESPACES,
-                new_value=None
+                new_value=1.3,
             ))
             variables.append(sedml_data_model.Variable(
                 id=specie,
@@ -634,3 +634,6 @@ class CliTestCase(unittest.TestCase):
 
         for data_set_result in report_results.values():
             self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
+
+if __name__ == "__main__":
+    unittest.main()
