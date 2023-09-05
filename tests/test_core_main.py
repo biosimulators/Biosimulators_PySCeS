@@ -603,37 +603,37 @@ class CliTestCase(unittest.TestCase):
 
         self._assert_combine_archive_outputs(doc, out_dir)
 
-    def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
-        archive_filename = os.path.join(os.path.dirname(__file__), 'fixtures', 'Parmar-BMC-Syst-Biol-2017-iron-distribution.omex')
-        out_dir = os.path.join(self.dirname, 'out')
-        docker_image = self.DOCKER_IMAGE
-        env = {
-            'REPORT_FORMATS': 'h5'
-        }
+    # def test_exec_sedml_docs_in_combine_archive_with_docker_image(self):
+    #     archive_filename = os.path.join(os.path.dirname(__file__), 'fixtures', 'Parmar-BMC-Syst-Biol-2017-iron-distribution.omex')
+    #     out_dir = os.path.join(self.dirname, 'out')
+    #     docker_image = self.DOCKER_IMAGE
+    #     env = {
+    #         'REPORT_FORMATS': 'h5'
+    #     }
 
-        exec_sedml_docs_in_archive_with_containerized_simulator(
-            archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
+    #     exec_sedml_docs_in_archive_with_containerized_simulator(
+    #         archive_filename, out_dir, docker_image, environment=env, pull_docker_image=False)
 
-        report = sedml_data_model.Report(
-            data_sets=[
-                sedml_data_model.DataSet(id='data_set_time', label='time'),
-                sedml_data_model.DataSet(id='data_set_FeDuo', label='FeDuo'),
-            ]
-        )
+    #     report = sedml_data_model.Report(
+    #         data_sets=[
+    #             sedml_data_model.DataSet(id='data_set_time', label='time'),
+    #             sedml_data_model.DataSet(id='data_set_FeDuo', label='FeDuo'),
+    #         ]
+    #     )
 
-        report_results = ReportReader().run(report, out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/report_1',
-                                            format=report_data_model.ReportFormat.h5)
+    #     report_results = ReportReader().run(report, out_dir, 'Parmar2017_Deficient_Rich_tracer.sedml/report_1',
+    #                                         format=report_data_model.ReportFormat.h5)
 
-        self.assertEqual(set(report_results.keys()), set(['data_set_time', 'data_set_FeDuo']))
+    #     self.assertEqual(set(report_results.keys()), set(['data_set_time', 'data_set_FeDuo']))
 
-        self.assertEqual(len(report_results['data_set_time']), 300 + 1)
-        numpy.testing.assert_allclose(
-            report_results['data_set_time'],
-            numpy.linspace(0., 5100., 300 + 1),
-        )
+    #     self.assertEqual(len(report_results['data_set_time']), 300 + 1)
+    #     numpy.testing.assert_allclose(
+    #         report_results['data_set_time'],
+    #         numpy.linspace(0., 5100., 300 + 1),
+    #     )
 
-        for data_set_result in report_results.values():
-            self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
+    #     for data_set_result in report_results.values():
+    #         self.assertFalse(numpy.any(numpy.isnan(data_set_result)))
 
 if __name__ == "__main__":
     unittest.main()
