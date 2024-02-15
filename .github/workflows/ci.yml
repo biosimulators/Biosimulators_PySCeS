@@ -52,16 +52,16 @@ jobs:
 
       #############################################
       ## Update the version of the simulator
-      #############################################
-      # - name: Check that the version of the simulator is available from PyPI
-      #   if: github.event.inputs.simulatorVersion
-      #   uses: emilioschepis/wait-for-endpoint@v1.0.3
-      #   with:
-      #     url: https://pypi.org/pypi/pysces/${{ github.event.inputs.simulatorVersion }}/json
-      #     method: GET
-      #     expected-status: 200
-      #     timeout: 3600000 # 1 hr
-      #     interval: 60000 # 1 min
+      #############################################0
+      - name: Check that the version of the simulator is available from PyPI
+        if: github.event.inputs.simulatorVersion
+        uses: emilioschepis/wait-for-endpoint@v1.0.3
+        with:
+          url: https://pypi.org/pypi/pysces/${{ github.event.inputs.simulatorVersion }}/json
+          method: GET
+          expected-status: 200
+          timeout: 3600000 # 1 hr
+          interval: 60000 # 1 min
 
       - name: Update the version of the simulator
         if: github.event.inputs.simulatorVersion
