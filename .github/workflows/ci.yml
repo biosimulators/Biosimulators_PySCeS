@@ -55,7 +55,7 @@ jobs:
       #############################################0
       - name: Check that the version of the simulator is available from PyPI
         if: github.event.inputs.simulatorVersion
-        uses: emilioschepis/wait-for-endpoint@v1
+        uses: emilioschepis/wait-for-endpoint@v1.0.3
         with:
           url: https://pypi.org/pypi/pysces/${{ github.event.inputs.simulatorVersion }}/json
           method: GET
