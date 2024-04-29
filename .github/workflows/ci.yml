@@ -38,7 +38,7 @@ jobs:
           mainBranch=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d '/' -f 4)
           mainBranchHeadRevision=$(git rev-parse refs/remotes/origin/${mainBranch})
           echo "mainBranch=$mainBranch" >> $GITHUB_OUTPUT
-          echo "mainBranchRef=$mainBranchRef" >> $GITHUB_OUTPUT
+          echo "mainBranchRef=refs/heads/$mainBranch" >> $GITHUB_OUTPUT
           echo "mainBranchHeadRevision=$mainBranchHeadRevision" >> $GITHUB_OUTPUT
 
       - name: Checkout ref
@@ -86,7 +86,7 @@ jobs:
           python-version: '3.10'
 
       - name: Setup caching for Python packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /opt/hostedtoolcache/Python
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements.optional.txt') }}
@@ -227,7 +227,7 @@ jobs:
         run: python -m pytest tests/ --cov=./biosimulators_pysces/ --cov-report=xml
 
       - name: Upload the coverage report to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
@@ -293,6 +293,7 @@ jobs:
           fi
 
           echo "release=$release" >> $GITHUB_OUTPUT
+          echo "release=$release"
 
       # If new tag, commit and push documentation
       - id: commit-docs
@@ -345,12 +346,8 @@ jobs:
           # Install pandoc
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends wget
-
-          wget https://github.com/jgm/pandoc/releases -O /tmp/pandocVersions.html
-          urlPart=`grep "\.deb" /tmp/pandocVersions.html | head -n 1 | cut -d'/' -f2-7 | cut -d'"' -f1`
-          wget "https://github.com/$urlPart" -O /tmp/pandoc.deb
+          wget "https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-1-amd64.deb" -O /tmp/pandoc.deb         
           sudo dpkg -i /tmp/pandoc.deb
-          rm /tmp/pandocVersions.html
           rm /tmp/pandoc.deb
 
           # Convert README to .rst format
