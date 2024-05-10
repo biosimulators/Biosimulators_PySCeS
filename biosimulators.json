@@ -1,7 +1,7 @@
 {
   "id": "pysces",
   "name": "PySCeS",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Simulation and analysis tools for modelling biological systems",
   "urls": [
     {
@@ -10,7 +10,7 @@
     }
   ],
   "image": {
-    "url": "ghcr.io/biosimulators/biosimulators_pysces/pysces:1.2.0",
+    "url": "ghcr.io/biosimulators/biosimulators_pysces/pysces:1.2.1",
     "format": {
       "namespace": "EDAM",
       "id": "format_3973",
