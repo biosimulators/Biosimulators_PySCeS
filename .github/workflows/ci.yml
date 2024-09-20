@@ -263,6 +263,10 @@ jobs:
           git add biosimulators.json Dockerfile
           git commit -m "Updating version of simulator"
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ failure() }}
+
       - name: Push the revised version of the simulator
         if: github.event.inputs.simulatorVersion && github.event.inputs.simulatorVersionLatest == 'true'
         uses: ad-m/github-push-action@master
