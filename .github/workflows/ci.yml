@@ -261,7 +261,7 @@ jobs:
           git pull
           git stash pop
           git add biosimulators.json Dockerfile
-          git commit -m "Updating version of simulator"
+          # git commit -m "Updating version of simulator"
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
