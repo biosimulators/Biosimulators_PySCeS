@@ -29,6 +29,7 @@ import numpy
 import os
 import pysces
 import tempfile
+import libsbml
 
 
 __all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_doc', 'exec_sed_task', 'preprocess_sed_task']
@@ -223,12 +224,20 @@ def preprocess_sed_task(task, variables, config=None):
     variable_target_sbml_id_map = validation.validate_target_xpaths(variables, model_etree, attr='id')
 
     # Read the model
+    sbml_converted_file, sbml_converted_filename = tempfile.mkstemp(suffix='.xml')
+    os.close(sbml_converted_file)
+
     sbml_model_filename = task.model.source
-    pysces_interface = pysces.PyscesInterfaces.Core2interfaces()
+    sbml_doc = libsbml.readSBMLFromFile(sbml_model_filename)
+    ia_conv = libsbml.SBMLInitialAssignmentConverter()
+    ia_conv.convert()
+    new_sbml_file = libsbml.writeSBMLToFile(sbml_doc, sbml_converted_filename)
+
     pysces_model_file, pysces_model_filename = tempfile.mkstemp(suffix='.psc')
+    pysces_interface = pysces.PyscesInterfaces.Core2interfaces()
     os.close(pysces_model_file)
     try:
-        pysces_interface.convertSBML2PSC(sbmlfile=sbml_model_filename, pscfile=pysces_model_filename)
+        pysces_interface.convertSBML2PSC(sbmlfile=sbml_converted_filename, pscfile=pysces_model_filename)
     except Exception as exception:
         os.remove(pysces_model_filename)
         raise ValueError('Model at {} could not be imported:\n  {}'.format(
@@ -297,16 +306,29 @@ def preprocess_sed_task(task, variables, config=None):
             ALGORITHM_SUBSTITUTION_POLICY_LEVELS[substitution_policy]
             >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SIMILAR_VARIABLES]
         ):
-            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
+            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events.',
                  AlgorithmSubstitutedWarning)
         else:
-            raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events')
+            raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events.')
+
+    # override algorithm choice if there are rules
+    if integrator['id'] == 'LSODA' and model.__rules__:
+        model.mode_integrator = 'CVODE'
+        substitution_policy = get_algorithm_substitution_policy(config=config)
+        if (
+            ALGORITHM_SUBSTITUTION_POLICY_LEVELS[substitution_policy]
+            >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SIMILAR_VARIABLES]
+        ):
+            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has rules.',
+                 AlgorithmSubstitutedWarning)
+        else:
+            model.mode_integrator = 'LSODA'
 
     if model.mode_integrator == 'CVODE':
         model.__settings__['cvode_return_event_timepoints'] = False
 
     # validate and preprocess variables
-    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions)
+    dynamic_ids = ['Time'] + list(set(model.species) | set(model.reactions) | set(model.__rules__.keys()))
     fixed_ids = (set(model.parameters) | set(model.__compartments__.keys())).difference(set(model.__rules__.keys()))
 
     variable_results_model_attr_map = {}
