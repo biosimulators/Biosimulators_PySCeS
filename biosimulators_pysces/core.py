@@ -231,7 +231,7 @@ def preprocess_sed_task(task, variables, config=None):
     sbml_doc = libsbml.readSBMLFromFile(sbml_model_filename)
     ia_conv = libsbml.SBMLInitialAssignmentConverter()
     ia_conv.convert()
-    new_sbml_file = libsbml.writeSBMLToFile(sbml_doc, sbml_converted_filename)
+    libsbml.writeSBMLToFile(sbml_doc, sbml_converted_filename)
 
     pysces_model_file, pysces_model_filename = tempfile.mkstemp(suffix='.psc')
     pysces_interface = pysces.PyscesInterfaces.Core2interfaces()
