@@ -156,15 +156,18 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
     model.Simulate()
 
     # extract results
-    results = model.data_sim.getAllSimData(lbls=False)
+    results, labels = model.data_sim.getAllSimData(lbls=True)
     variable_results = VariableResults()
     variable_results_model_attr_map = preprocessed_task['model']['variable_results_model_attr_map']
     for variable in variables:
-        i_results, model_attr_name = variable_results_model_attr_map[(variable.target, variable.symbol)]
-        if i_results is not None:
-            variable_results[variable.id] = results[:, i_results][-(sim.number_of_points + 1):]
+        label = variable_results_model_attr_map[(variable.target, variable.symbol)]
+        index = labels.index(label)
+
+        if index is not None:
+            variable_results[variable.id] = results[:, index][-(sim.number_of_points + 1):]
         else:
-            variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
+            raise ValueError("No variable " + variable.id + " found in simulation output.")
+            #variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
 
     # log action
     if config.LOG:
@@ -339,7 +342,7 @@ def preprocess_sed_task(task, variables, config=None):
     for variable in variables:
         if variable.symbol:
             if variable.symbol == Symbol.time.value:
-                variable_results_model_attr_map[(variable.target, variable.symbol)] = (0, None)
+                variable_results_model_attr_map[(variable.target, variable.symbol)] = "Time"
             else:
                 unpredicted_symbols.append(variable.symbol)
 
@@ -347,10 +350,10 @@ def preprocess_sed_task(task, variables, config=None):
             sbml_id = variable_target_sbml_id_map[variable.target]
             try:
                 i_dynamic = dynamic_ids.index(sbml_id)
-                variable_results_model_attr_map[(variable.target, variable.symbol)] = (i_dynamic, None)
+                variable_results_model_attr_map[(variable.target, variable.symbol)] = sbml_id
             except ValueError:
                 if sbml_id in fixed_ids:
-                    variable_results_model_attr_map[(variable.target, variable.symbol)] = (None, sbml_id)
+                    variable_results_model_attr_map[(variable.target, variable.symbol)] = sbml_id
                 else:
                     unpredicted_targets.append(variable.target)
 
