@@ -235,7 +235,7 @@ def preprocess_sed_task(task, variables, config=None):
     ia_conv.setDocument(sbml_doc)
     success = ia_conv.convert()
     if success != 0:
-        warn("Initial assignment conversion failed: any initial assignments in this model will remain, which PySCeS may not be able to handle.")
+        warn("Initial assignment conversion failed: any initial assignments in this model will remain, which PySCeS may not be able to handle.", BioSimulatorsWarning)
     libsbml.writeSBMLToFile(sbml_doc, sbml_converted_filename)
 
     pysces_model_file, pysces_model_filename = tempfile.mkstemp(suffix='.psc')
