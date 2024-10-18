@@ -25,10 +25,10 @@ from kisao.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION
 from kisao.utils import get_preferred_substitute_algorithm_by_ids
 from kisao.warnings import AlgorithmSubstitutedWarning
 import lxml.etree
-import numpy
 import os
 import pysces
 import tempfile
+import libsbml
 
 
 __all__ = ['exec_sedml_docs_in_combine_archive', 'exec_sed_doc', 'exec_sed_task', 'preprocess_sed_task']
@@ -155,15 +155,18 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
     model.Simulate()
 
     # extract results
-    results = model.data_sim.getAllSimData(lbls=False)
+    results, labels = model.data_sim.getAllSimData(lbls=True)
     variable_results = VariableResults()
     variable_results_model_attr_map = preprocessed_task['model']['variable_results_model_attr_map']
     for variable in variables:
-        i_results, model_attr_name = variable_results_model_attr_map[(variable.target, variable.symbol)]
-        if i_results is not None:
-            variable_results[variable.id] = results[:, i_results][-(sim.number_of_points + 1):]
+        label = variable_results_model_attr_map[(variable.target, variable.symbol)]
+        index = labels.index(label)
+
+        if index is not None:
+            variable_results[variable.id] = results[:, index][-(sim.number_of_points + 1):]
         else:
-            variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
+            raise ValueError("No variable " + variable.id + " found in simulation output.")
+            # variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
 
     # log action
     if config.LOG:
@@ -223,12 +226,24 @@ def preprocess_sed_task(task, variables, config=None):
     variable_target_sbml_id_map = validation.validate_target_xpaths(variables, model_etree, attr='id')
 
     # Read the model
+    sbml_converted_file, sbml_converted_filename = tempfile.mkstemp(suffix='.xml')
+    os.close(sbml_converted_file)
+
     sbml_model_filename = task.model.source
-    pysces_interface = pysces.PyscesInterfaces.Core2interfaces()
+    sbml_doc = libsbml.readSBMLFromFile(sbml_model_filename)
+    ia_conv = libsbml.SBMLInitialAssignmentConverter()
+    ia_conv.setDocument(sbml_doc)
+    success = ia_conv.convert()
+    if success != 0:
+        warn("Initial assignment conversion failed: any initial assignments in this model will remain, which PySCeS may not be able to handle.",
+             BioSimulatorsWarning)
+    libsbml.writeSBMLToFile(sbml_doc, sbml_converted_filename)
+
     pysces_model_file, pysces_model_filename = tempfile.mkstemp(suffix='.psc')
+    pysces_interface = pysces.PyscesInterfaces.Core2interfaces()
     os.close(pysces_model_file)
     try:
-        pysces_interface.convertSBML2PSC(sbmlfile=sbml_model_filename, pscfile=pysces_model_filename)
+        pysces_interface.convertSBML2PSC(sbmlfile=sbml_converted_filename, pscfile=pysces_model_filename)
     except Exception as exception:
         os.remove(pysces_model_filename)
         raise ValueError('Model at {} could not be imported:\n  {}'.format(
@@ -297,16 +312,29 @@ def preprocess_sed_task(task, variables, config=None):
             ALGORITHM_SUBSTITUTION_POLICY_LEVELS[substitution_policy]
             >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SIMILAR_VARIABLES]
         ):
-            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events',
+            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has events.',
                  AlgorithmSubstitutedWarning)
         else:
-            raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events')
+            raise AlgorithmDoesNotSupportModelFeatureException('LSODA cannot execute the simulation because the model has events.')
+
+    # override algorithm choice if there are rules
+    if integrator['id'] == 'LSODA' and model.__rules__:
+        model.mode_integrator = 'CVODE'
+        substitution_policy = get_algorithm_substitution_policy(config=config)
+        if (
+            ALGORITHM_SUBSTITUTION_POLICY_LEVELS[substitution_policy]
+            >= ALGORITHM_SUBSTITUTION_POLICY_LEVELS[AlgorithmSubstitutionPolicy.SIMILAR_VARIABLES]
+        ):
+            warn('CVODE (KISAO_0000019) will be used rather than LSODA (KISAO_0000088) because the model has rules.',
+                 AlgorithmSubstitutedWarning)
+        else:
+            model.mode_integrator = 'LSODA'
 
     if model.mode_integrator == 'CVODE':
         model.__settings__['cvode_return_event_timepoints'] = False
 
     # validate and preprocess variables
-    dynamic_ids = ['Time'] + list(model.species) + list(model.reactions)
+    dynamic_ids = ['Time'] + list(set(model.species) | set(model.reactions) | set(model.__rules__.keys()))
     fixed_ids = (set(model.parameters) | set(model.__compartments__.keys())).difference(set(model.__rules__.keys()))
 
     variable_results_model_attr_map = {}
@@ -317,18 +345,17 @@ def preprocess_sed_task(task, variables, config=None):
     for variable in variables:
         if variable.symbol:
             if variable.symbol == Symbol.time.value:
-                variable_results_model_attr_map[(variable.target, variable.symbol)] = (0, None)
+                variable_results_model_attr_map[(variable.target, variable.symbol)] = "Time"
             else:
                 unpredicted_symbols.append(variable.symbol)
 
         else:
             sbml_id = variable_target_sbml_id_map[variable.target]
             try:
-                i_dynamic = dynamic_ids.index(sbml_id)
-                variable_results_model_attr_map[(variable.target, variable.symbol)] = (i_dynamic, None)
+                variable_results_model_attr_map[(variable.target, variable.symbol)] = sbml_id
             except ValueError:
                 if sbml_id in fixed_ids:
-                    variable_results_model_attr_map[(variable.target, variable.symbol)] = (None, sbml_id)
+                    variable_results_model_attr_map[(variable.target, variable.symbol)] = sbml_id
                 else:
                     unpredicted_targets.append(variable.target)
 

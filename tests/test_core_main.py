@@ -174,14 +174,12 @@ class CliTestCase(unittest.TestCase):
                 task=task,
             ))
 
-        preprocessed_task = core.preprocess_sed_task(task, variables)
-
         task.model.changes = []
-        results, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        results, _ = core.exec_sed_task(task, variables)
 
         task.simulation.output_end_time /= 2
         task.simulation.number_of_points = int(task.simulation.number_of_points / 2)
-        results2, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        results2, _ = core.exec_sed_task(task, variables)
         for specie in species:
             numpy.testing.assert_allclose(results2[specie], results[specie][0:task.simulation.number_of_points + 1])
 
@@ -191,7 +189,7 @@ class CliTestCase(unittest.TestCase):
                 target_namespaces=self.NAMESPACES,
                 new_value=results2[specie][-1],
             ))
-        results3, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        results3, _ = core.exec_sed_task(task, variables)
         for specie in species:
             numpy.testing.assert_allclose(results3[specie], results[specie][task.simulation.number_of_points:], rtol=1e-4)
 
@@ -201,9 +199,16 @@ class CliTestCase(unittest.TestCase):
                 target_namespaces=self.NAMESPACES,
                 new_value=str(results2[specie][-1]),
             ))
-        results3, _ = core.exec_sed_task(task, variables, preprocessed_task=preprocessed_task)
+        results3, _ = core.exec_sed_task(task, variables)
         for specie in species:
             numpy.testing.assert_allclose(results3[specie], results[specie][task.simulation.number_of_points:], rtol=1e-4)
+
+        task2 = copy.deepcopy(task)
+        task2.model.changes = []
+        task2.model.source = os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000678.xml')
+        variables2 = copy.deepcopy(variables[1])
+        variables2.target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dNFAT']"
+        core.exec_sed_task(task2, [variables2])
 
     def test_exec_sed_task_error_handling(self):
         with mock.patch.dict('os.environ', {'ALGORITHM_SUBSTITUTION_POLICY': 'NONE'}):
@@ -286,14 +291,6 @@ class CliTestCase(unittest.TestCase):
             with self.assertRaisesRegex(NotImplementedError, 'symbols are not supported'):
                 core.exec_sed_task(task, variables)
             variables[0].symbol = sedml_data_model.Symbol.time
-
-            task2 = copy.deepcopy(task)
-            task2.model.source = os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000678.xml')
-            variables2 = copy.deepcopy(variables[1:2])
-            variables2[0].target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dNFAT']"
-            with self.assertRaisesRegex(ValueError, 'targets cannot not be recorded'):
-                core.exec_sed_task(task2, variables2)
-            variables[1].target = "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='AL']"
 
         # algorithm substition
         task = sedml_data_model.Task(
