@@ -25,6 +25,7 @@ from kisao.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION
 from kisao.utils import get_preferred_substitute_algorithm_by_ids
 from kisao.warnings import AlgorithmSubstitutedWarning
 import lxml.etree
+import numpy
 import os
 import pysces
 import tempfile
@@ -160,13 +161,12 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
     variable_results_model_attr_map = preprocessed_task['model']['variable_results_model_attr_map']
     for variable in variables:
         label = variable_results_model_attr_map[(variable.target, variable.symbol)]
-        index = labels.index(label)
 
-        if index is not None:
+        if label in labels:
+            index = labels.index(label)
             variable_results[variable.id] = results[:, index][-(sim.number_of_points + 1):]
         else:
-            raise ValueError("No variable " + variable.id + " found in simulation output.")
-            # variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
+            variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, label))
 
     # log action
     if config.LOG:
