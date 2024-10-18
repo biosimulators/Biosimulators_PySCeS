@@ -25,7 +25,6 @@ from kisao.data_model import AlgorithmSubstitutionPolicy, ALGORITHM_SUBSTITUTION
 from kisao.utils import get_preferred_substitute_algorithm_by_ids
 from kisao.warnings import AlgorithmSubstitutedWarning
 import lxml.etree
-import numpy
 import os
 import pysces
 import tempfile
@@ -167,7 +166,7 @@ def exec_sed_task(task, variables, preprocessed_task=None, log=None, config=None
             variable_results[variable.id] = results[:, index][-(sim.number_of_points + 1):]
         else:
             raise ValueError("No variable " + variable.id + " found in simulation output.")
-            #variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
+            # variable_results[variable.id] = numpy.full((sim.number_of_points + 1,), getattr(model, model_attr_name))
 
     # log action
     if config.LOG:
@@ -349,7 +348,6 @@ def preprocess_sed_task(task, variables, config=None):
         else:
             sbml_id = variable_target_sbml_id_map[variable.target]
             try:
-                i_dynamic = dynamic_ids.index(sbml_id)
                 variable_results_model_attr_map[(variable.target, variable.symbol)] = sbml_id
             except ValueError:
                 if sbml_id in fixed_ids:
