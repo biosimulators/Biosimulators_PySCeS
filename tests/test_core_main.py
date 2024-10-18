@@ -91,6 +91,12 @@ class CliTestCase(unittest.TestCase):
                 target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL']",
                 target_namespaces=self.NAMESPACES,
                 task=task),
+            sedml_data_model.Variable(
+                id='kf0',
+                target="/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='kf_0']",
+                target_namespaces=self.NAMESPACES,
+                task=task,
+            ),
         ]
 
         variable_results, _ = core.exec_sed_task(task, variables)
