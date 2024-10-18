@@ -299,9 +299,9 @@ jobs:
           echo "release=$release" >> $GITHUB_OUTPUT
           echo "release=$release"
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: steps.determine-if-release-needed.outputs.release == '0'
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      #   if: steps.determine-if-release-needed.outputs.release == '0'
 
       # If new tag, commit and push documentation
       - id: commit-docs
