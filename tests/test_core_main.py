@@ -204,10 +204,11 @@ class CliTestCase(unittest.TestCase):
             numpy.testing.assert_allclose(results3[specie], results[specie][task.simulation.number_of_points:], rtol=1e-4)
 
         task2 = copy.deepcopy(task)
+        task2.model.changes = []
         task2.model.source = os.path.join(os.path.dirname(__file__), 'fixtures', 'biomd0000000678.xml')
-        variables2 = copy.deepcopy(variables[1:2])
-        variables2[0].target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dNFAT']"
-        core.exec_sed_task(task2, variables2)
+        variables2 = copy.deepcopy(variables[1])
+        variables2.target = "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dNFAT']"
+        core.exec_sed_task(task2, [variables2])
 
     def test_exec_sed_task_error_handling(self):
         with mock.patch.dict('os.environ', {'ALGORITHM_SUBSTITUTION_POLICY': 'NONE'}):
